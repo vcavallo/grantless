@@ -1,0 +1,8 @@
+{
+  "engineeringTeam": {
+    "strictness": "Standard",
+    "adrsEnabled": true,
+    "requireCleanTree": true,
+    "perPhaseCommits": true
+  }
+}
