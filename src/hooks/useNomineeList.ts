@@ -29,9 +29,14 @@ export function useNomineeList(naddr: string | null): NomineeListResult {
     queryKey: ['nominee-list', trimmed],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
+      // Follow the naddr's own relay hints to find the list (it may not live on
+      // the user's configured relay). Hints come from the user-pasted address,
+      // so this stays fully open/permissionless. Fall back to the configured
+      // relay when the naddr carries no hints.
+      const opts = coord!.relays?.length ? { signal, relays: coord!.relays } : { signal };
       const events = await nostr.query(
         [{ kinds: [coord!.kind], authors: [coord!.pubkey], '#d': [coord!.identifier], limit: 1 }],
-        { signal },
+        opts,
       );
       if (events.length === 0) return null;
       // Addressable event: newest version wins.
