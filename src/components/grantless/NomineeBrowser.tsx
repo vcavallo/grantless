@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useNomineeList } from '@/hooks/useNomineeList';
+import { useNomineeProfiles } from '@/hooks/useNomineeProfiles';
 import { useTaskProposals } from '@/hooks/useCatallax';
 import { groupTasksByPatron } from '@/lib/grantless';
+import { getActiveRelays } from '@/lib/relays';
 import { NomineeCard } from './NomineeCard';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Input } from '@/components/ui/input';
@@ -24,9 +27,18 @@ export function NomineeBrowser() {
   // Auto-load the remembered list on mount.
   const [activeNaddr, setActiveNaddr] = useState(savedNaddr);
 
+  const { config, presetRelays } = useAppContext();
   const { pubkeys, status, error, relays } = useNomineeList(activeNaddr || null);
   const { data: tasks = [] } = useTaskProposals();
   const tasksByPatron = useMemo(() => groupTasksByPatron(tasks), [tasks]);
+
+  // Fetch nominee profiles from the list's relays plus the configured set —
+  // a nominee's kind-0 often lives on a different relay than the app default.
+  const profileRelays = useMemo(
+    () => Array.from(new Set([...relays, ...getActiveRelays(config, presetRelays)])),
+    [relays, config, presetRelays],
+  );
+  const { data: profiles } = useNomineeProfiles(pubkeys, profileRelays);
 
   // Persist only lists that actually resolved.
   useEffect(() => {
@@ -116,7 +128,12 @@ export function NomineeBrowser() {
       {status === 'ready' && (
         <div className="grid gap-4 sm:grid-cols-2">
           {pubkeys.map((pubkey) => (
-            <NomineeCard key={pubkey} pubkey={pubkey} tasks={tasksByPatron.get(pubkey) ?? []} />
+            <NomineeCard
+              key={pubkey}
+              pubkey={pubkey}
+              tasks={tasksByPatron.get(pubkey) ?? []}
+              metadata={profiles?.get(pubkey)}
+            />
           ))}
         </div>
       )}

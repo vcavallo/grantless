@@ -1,18 +1,22 @@
-import { useAuthor } from '@/hooks/useAuthor';
+import type { NostrMetadata } from '@nostrify/nostrify';
 import { genUserName } from '@/lib/genUserName';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { NomineeProjectItem } from './NomineeProjectItem';
 import type { TaskProposal } from '@/lib/catallax';
 
+interface NomineeCardProps {
+  pubkey: string;
+  tasks: TaskProposal[];
+  /** Profile metadata (batch-fetched by the browser); falls back when absent. */
+  metadata?: NostrMetadata;
+}
+
 /**
  * A single nominee: profile (name + avatar, with fallback) and their Catallax
  * projects beneath — or "No projects yet" when they've posted none.
  */
-export function NomineeCard({ pubkey, tasks }: { pubkey: string; tasks: TaskProposal[] }) {
-  const author = useAuthor(pubkey);
-  const metadata = author.data?.metadata;
-
+export function NomineeCard({ pubkey, tasks, metadata }: NomineeCardProps) {
   const displayName = metadata?.name ?? genUserName(pubkey);
   const image = metadata?.picture;
   const initial = displayName.slice(0, 2).toUpperCase();
