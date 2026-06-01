@@ -25,9 +25,9 @@ A review file at `.pi/engineering-team/reviews/<n>-<slug>.md` ending in **PASS**
 5. **Things tests can't catch:** off-by-ones in untested branches, race conditions, security issues, secrets, leftover debug code, scope creep.
 6. **House rules:**
 
+   - **Open, permissionless, WoT-based (prime directive)** — block any diff that special-cases/allowlists a pubkey, relay, or arbiter; encodes trust in code instead of deriving it from the Web of Trust; or adds a hardcoded relay URL, Blossom server, suggested arbiter, or API endpoint that isn't ENV/config-overridable and documented as a plain default. Test: could anyone clone this, repoint at their own infra, and run it identically?
    - No nsec exposure. Clear user signaling for signing/payments.
-   - No hardcoded centralization — flag any new hardcoded relay URLs, Blossom servers, or API endpoints that aren't configurable.
-   - Decentralization-friendly UI.
+   - Decentralization-friendly UI — no privileged actors.
 
 7. **Write the review** using `engineering-team/templates/review-checklist.md`.
 8. **State verdict:** PASS or CHANGES_REQUESTED with file:line refs.

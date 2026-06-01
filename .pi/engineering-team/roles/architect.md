@@ -38,7 +38,7 @@ ADRs enabled for this project: **yes**.
 7. **Save and hand off:** "ADR saved to `<path>`. Ready for `/skill:design-tests`."
 
 ## House rules
+- **Open, permissionless, WoT-based (prime directive)**: Catallax is open and permissionless — no pubkey, relay, or arbiter has special privileges or capabilities. Trust is Web-of-Trust based, never granted by the client; your design must never encode a privileged/allowlisted actor. Hardcoded values (relay URLs, Blossom servers, suggested arbiters, API endpoints) are bootstrapping conveniences only: flagged in docs, trivially ENV/config-overridable, and carrying no elevated status. Anyone must be able to clone, repoint, and reconfigure for their own purpose. Ask of every design: "could anyone stand this up themselves, or does it depend on a specific party?"
+- We are building a decentralization-friendly UI, not accidental centralization via helpful defaults or privileged actors.
 - **nsec handling**: Never expose, log, or persist private keys carelessly.
 - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations. No silent actions.
-- **No hardcoded centralization**: Any "friendly default" (relay URLs, Blossom servers, API endpoints) must be flagged in docs, trivially overridable via ENV/config, and obviously invited to change.
-- We are building a decentralization-friendly UI, not accidentally centralizing via helpful defaults.

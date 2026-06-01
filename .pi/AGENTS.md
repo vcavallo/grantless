@@ -2,6 +2,8 @@
 
 A Nostr client demonstrating the Catallax protocol for decentralized gig marketplaces settled via Lightning. This is a **reference implementation** for developers — not a production end-user app. It covers all basic protocol functionality with no opinionated customizations, so other devs can fork it and narrow it down (filter by tags, authors, etc.) for their own use cases.
 
+**Catallax is open, permissionless, and Web-of-Trust based.** No pubkey, relay, or arbiter holds special privileges or capabilities — trust is social, via the WoT, never granted by the client. Some defaults may be hardcoded to ease bootstrapping, but everything is overridable, and anyone must be able to clone, reconfigure, and run it for their own purpose. See the prime directive under [House rules](#house-rules).
+
 **Stage:** Active rewrite — migrating away from MKStack toward a more framework-agnostic approach (vanilla React, Alpine.js, or similar). Stack decisions are in flux.
 
 ## Tech stack
@@ -42,6 +44,7 @@ A Nostr client demonstrating the Catallax protocol for decentralized gig marketp
 
 ## Architecture rules
 
+- **Open & permissionless by construction**: The architecture must not encode privileged pubkeys, relays, or arbiters. No allowlist, no special-cased operator, no trust granted in code. Trust is WoT-derived and surfaced, not conferred. Any bootstrapping default is a plain, overridable suggestion with no elevated capability. (See the prime directive in House rules.)
 - **Wrapper/adapter layer**: Implementation code talks to our wrappers around Nostr protocol functions, not directly to library APIs. Swapping out `nostr-tools` or any other library should only require changes at the wrapper layer.
 - **Minimal coupling to opinionated frameworks**: Keep the codebase forkable. Nostr-specific libraries are acceptable where they provide fundamental value (relay pool management, NIP implementations, event signing). Avoid opinionated "stacks" that bundle too many decisions.
 - **Clear separation of concerns**: UI layer, protocol layer, and data layer should be separable so someone forking can swap out UI or narrow functionality without untangling deeply coupled code.
@@ -49,13 +52,24 @@ A Nostr client demonstrating the Catallax protocol for decentralized gig marketp
 
 ## House rules
 
+### Open, permissionless, Web-of-Trust based (the prime directive)
+
+**Catallax is open, permissionless, and Web-of-Trust based. This is the single most important property of the system, and every other house rule serves it.**
+
+- **No privileged actors.** No pubkey, relay, arbiter, Blossom server, or any other party has special privileges, elevated capabilities, or a built-in role that others cannot also fill. There are no admins, no allowlists baked into the client, no gatekeepers. Anyone can be a patron, worker, arbiter, or relay operator simply by participating.
+- **Trust comes from the Web of Trust, never from the client.** Reputation, arbiter selection, and counterparty trust are established socially through the WoT — the client surfaces that signal; it does not confer, hardcode, or arbitrate it. The code must never encode "this pubkey/relay is trusted" as a privileged fact.
+- **Bootstrapping defaults are allowed; privilege is not.** Hardcoded values that exist purely to make first-run convenient (default relay URLs, Blossom servers, suggested arbiters, API endpoints) are fine *as conveniences only*. Every one MUST be:
+  - Flagged prominently in docs as a default, not a requirement.
+  - Trivially overridable via ENV variables or configuration settings.
+  - Obvious and *invited* to change — the UI/docs make clear these are starting points.
+  - Free of any special status: a default relay/arbiter is just a suggestion, identical in capability to any other the user picks.
+- **Anyone can fork, clone, and reconfigure for their own purpose.** This is a reference client. A default must never be load-bearing in a way that makes the system depend on *us*, our infrastructure, or any specific operator. If someone clones the repo, points it at their own relays/arbiters, and changes the settings, it must work exactly as well. Always ask: "does this create a dependency on a specific party, or could anyone stand this up themselves?"
+- We are building a **decentralization-friendly UI**, not accidentally creating de facto centralization via helpful defaults or privileged pubkeys/relays.
+
+### Other house rules
+
 - **nsec handling**: Never expose, log, or persist private keys carelessly. Treat nsecs as radioactive.
 - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations. No silent actions that spend sats or publish on behalf of the user.
-- **No hardcoded centralization**: Any value that is hardcoded as a "friendly default so bootstrapping is convenient" (relay URLs, Blossom servers, API endpoints, etc.) MUST be:
-  - Flagged prominently in docs
-  - Trivially overridable via ENV variables or configuration settings
-  - Obvious and *invited* to change — the UI/docs should make it clear these are defaults, not requirements
-- We are building a **decentralization-friendly UI**, not accidentally creating de facto centralization via helpful defaults.
 - Basic Nostr security best practices throughout.
 
 ## Engineering Team Mode

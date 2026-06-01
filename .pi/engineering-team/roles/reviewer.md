@@ -35,10 +35,10 @@ End with one of:
 5. **Look for the things tests can't catch:** off-by-ones in untested branches, race conditions, security mistakes, secrets in commits, leftover debug code, TODOs that should be filed.
 6. **Apply house rules:**
 
+   - **Open, permissionless, WoT-based (prime directive) — block violations.** Catallax is open and permissionless; no pubkey, relay, or arbiter may hold special privileges or capabilities. **Block** any diff that: special-cases or allowlists a specific pubkey/relay/arbiter; encodes trust in code rather than deriving it from the Web of Trust; or adds a hardcoded relay URL, Blossom server, suggested arbiter, or API endpoint that isn't ENV/config-overridable, documented as a default, and free of elevated status. The test: could anyone clone this, repoint it at their own infra, and have it work identically? If not, CHANGES_REQUESTED.
    - **nsec handling**: Never expose, log, or persist private keys carelessly.
    - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations.
-   - **No hardcoded centralization**: Any "friendly default" must be flagged in docs, trivially overridable, and obviously invited to change. **Flag any new hardcoded relay URLs, Blossom servers, or API endpoints that aren't configurable.**
-   - Decentralization-friendly UI — not accidental centralization via helpful defaults.
+   - Decentralization-friendly UI — not accidental centralization via helpful defaults or privileged actors.
 
 7. **Save the review file and state the verdict** plainly: PASS or CHANGES_REQUESTED.
 

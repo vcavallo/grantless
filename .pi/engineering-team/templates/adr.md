@@ -26,6 +26,13 @@ We chose **Option <X>** because <reason>.
 - What this constrains or makes harder.
 - What new debt or follow-ups this creates.
 
+## Openness / permissionlessness check (required)
+Catallax is open, permissionless, and WoT-based. State explicitly:
+- Does this design grant any pubkey, relay, or arbiter special privileges or capabilities? (Must be **no**.)
+- Is trust derived from the Web of Trust rather than encoded in the client? (Must be **yes**.)
+- List any hardcoded defaults introduced (relay URLs, Blossom servers, suggested arbiters, API endpoints) and confirm each is ENV/config-overridable, documented as a default, and free of elevated status.
+- Fork test: could anyone clone this, repoint it at their own infra, and run it identically? (Must be **yes**.)
+
 ## Implementation notes
 Specific files, function names, module boundaries. The Implementer reads this, so be concrete.
 

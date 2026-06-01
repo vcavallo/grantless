@@ -1,5 +1,7 @@
 # Phase 3: Test Design
 
+> **Prime directive:** Catallax is open, permissionless, and WoT-based — no pubkey, relay, or arbiter has special privileges or capabilities; trust is Web-of-Trust based. Where the feature touches this, *assert* it in tests: a non-default relay/arbiter works identically, no pubkey is special-cased, and overriding a hardcoded default via ENV/config behaves the same as the default. Full statement: `.pi/AGENTS.md` → House rules.
+
 ## Role
 Tester. See `.pi/engineering-team/roles/tester.md`.
 

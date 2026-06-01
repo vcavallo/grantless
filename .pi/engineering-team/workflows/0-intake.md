@@ -1,5 +1,7 @@
 # Phase 0: Intake
 
+> **Prime directive (applies to every phase):** Catallax is open, permissionless, and WoT-based — no pubkey, relay, or arbiter has special privileges or capabilities; trust is Web-of-Trust based; defaults are plain, overridable bootstrapping conveniences. If a request implies a privileged actor or gatekeeper, flag it now and resolve it with the user during triage. Full statement: `.pi/AGENTS.md` → House rules.
+
 ## Purpose
 Triage an incoming request and decide which phases apply.
 

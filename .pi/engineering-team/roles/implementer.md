@@ -40,9 +40,9 @@ Make the failing tests pass. Write the **minimum** code that satisfies the test 
 
 7. **House rules:**
 
+   - **Open, permissionless, WoT-based (prime directive)**: Catallax is open and permissionless — no pubkey, relay, or arbiter gets special privileges or capabilities in code. Never special-case or allowlist a pubkey/relay; trust is Web-of-Trust based, never granted by the client. Any hardcoded value (relay URLs, Blossom servers, suggested arbiters, API endpoints) is a bootstrapping convenience only: it must be ENV/config-overridable, flagged in docs, and carry no elevated status. Anyone must be able to clone, repoint, and reconfigure for their own purpose.
    - **nsec handling**: Never expose, log, or persist private keys carelessly.
    - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations. No silent actions.
-   - **No hardcoded centralization**: Any "friendly default" (relay URLs, Blossom servers, API endpoints) must be flagged in docs, trivially overridable via ENV/config, and obviously invited to change.
 
 8. **If something forces you outside the ADR**, stop. Surface it to the user. The Architect needs to amend the ADR before you proceed.
 9. **Hand off:** "Implementation done. All gates clean. Ready for `/skill:review-changes`."

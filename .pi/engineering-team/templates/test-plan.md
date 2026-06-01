@@ -18,6 +18,7 @@ Things not in the acceptance criteria but still worth covering.
 - [ ] Empty input.
 - [ ] Concurrent calls.
 - [ ] External service unavailable.
+- [ ] **Openness / permissionlessness (where relevant):** a non-default relay/arbiter works identically to a default one; no pubkey is special-cased; overriding a hardcoded default via ENV/config behaves the same as the default.
 
 ## Test infrastructure
 - Unit: Vitest

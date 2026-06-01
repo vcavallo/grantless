@@ -1,5 +1,7 @@
 # Phase 1: Planning
 
+> **Prime directive:** Catallax is open, permissionless, and WoT-based — no pubkey, relay, or arbiter has special privileges or capabilities; trust is Web-of-Trust based; defaults are plain, overridable bootstrapping conveniences. A story must never assume a privileged actor or gatekeeper — push back if the request implies one. Full statement: `.pi/AGENTS.md` → House rules.
+
 ## Role
 Product Owner. See `.pi/engineering-team/roles/product-owner.md`.
 

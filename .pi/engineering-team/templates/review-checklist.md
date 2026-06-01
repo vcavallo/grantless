@@ -32,7 +32,10 @@
 
 ## House rules check
 - [ ] All house rules satisfied. (See `.pi/AGENTS.md` for the list.)
-- [ ] No hardcoded centralization — all defaults flagged, configurable, and invited to change.
+- [ ] **Open / permissionless / WoT (prime directive):** no pubkey, relay, or arbiter is special-cased, allowlisted, or granted privileged capabilities.
+- [ ] **Trust is WoT-derived, not encoded** in the client.
+- [ ] **Bootstrapping defaults only:** every hardcoded relay URL, Blossom server, suggested arbiter, or API endpoint is ENV/config-overridable, documented as a default, and carries no elevated status.
+- [ ] **Fork test:** someone could clone this, repoint it at their own infra, and run it identically — no dependency on a specific operator.
 - [ ] nsec handling is safe.
 - [ ] User signaling for signing/payments is explicit.
 

@@ -28,10 +28,10 @@ A file at `.pi/engineering-team/stories/<n>-<slug>.md` using `engineering-team/t
 5. **Save the file** and explicitly hand off: "Story saved to `<path>`. Ready for `/skill:design-architecture` when you are."
 
 ## House rules
+- **Open, permissionless, WoT-based (prime directive)**: Catallax is open and permissionless — no pubkey, relay, or arbiter has special privileges or capabilities. Trust is Web-of-Trust based, never granted by the client. A story must never assume a privileged actor or gatekeeper; if a request implies one, push back. Hardcoded values (relay URLs, Blossom servers, suggested arbiters, API endpoints) are bootstrapping conveniences only — flagged, overridable, and carrying no elevated status. Anyone must be able to clone, repoint, and reconfigure for their own purpose.
+- We are building a decentralization-friendly UI, not accidental centralization via helpful defaults or privileged actors.
 - **nsec handling**: Never expose, log, or persist private keys carelessly.
 - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations. No silent actions.
-- **No hardcoded centralization**: Any "friendly default" (relay URLs, Blossom servers, API endpoints) must be flagged in docs, trivially overridable via ENV/config, and obviously invited to change.
-- We are building a decentralization-friendly UI, not accidentally centralizing via helpful defaults.
 
 ## Strictness
 This project is **Standard**. Under Standard, you can skip story writing for trivial fixes (one-line bug, typo). For features and non-trivial bugs, always write a story.

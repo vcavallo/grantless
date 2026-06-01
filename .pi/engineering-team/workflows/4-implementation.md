@@ -27,8 +27,8 @@ Implementer. See `.pi/engineering-team/roles/implementer.md`.
 
 6. **Honor house rules:**
 
+   - **Open, permissionless, WoT-based (prime directive)**: never special-case or allowlist a pubkey/relay/arbiter; trust is WoT-based, never granted by the client. Any hardcoded default (relay URLs, Blossom servers, suggested arbiters, API endpoints) is a bootstrapping convenience only — ENV/config-overridable, documented, no elevated status. Anyone must be able to clone, repoint, and reconfigure for their own purpose.
    - No nsec exposure. Clear user signaling for signing/payments.
-   - No hardcoded centralization — any default must be flagged, configurable, and obviously invited to change.
 
 7. **Run all gates:**
    - `npm test`

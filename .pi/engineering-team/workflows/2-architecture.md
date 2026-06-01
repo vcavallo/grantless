@@ -16,6 +16,7 @@ An ADR at `.pi/engineering-team/decisions/<NNNN>-<slug>.md` (numbering: zero-pad
 3. **List options.** At least two — one chosen, one alternative.
 4. **Pick and justify.** Note tradeoffs. Note what existing architecture rules apply:
 
+   - **Open, permissionless, WoT-based (prime directive)**: No pubkey, relay, or arbiter may hold special privileges or capabilities in the design. Trust is Web-of-Trust based, never granted by the client — never allowlist or special-case an actor. Hardcoded defaults are bootstrapping conveniences only: overridable, documented as defaults, no elevated status. The ADR must let anyone clone, repoint at their own infra, and run it identically.
    - **Wrapper/adapter layer**: Implementation code talks to our wrappers around Nostr protocol functions, not directly to library APIs.
    - **Minimal coupling to opinionated frameworks**: Keep the codebase forkable.
    - **Clear separation of concerns**: UI, protocol, and data layers should be separable.

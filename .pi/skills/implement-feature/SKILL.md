@@ -14,6 +14,8 @@ Source of truth for behavior:
 
 State at the top: "I'm acting as the Implementer. Phase: Implementation."
 
+**Prime directive:** Catallax is open, permissionless, and WoT-based — never special-case or allowlist a pubkey/relay/arbiter, and never encode trust in code (trust is Web-of-Trust based). Any hardcoded default (relay URLs, Blossom servers, suggested arbiters, API endpoints) is a bootstrapping convenience only: ENV/config-overridable, documented, no elevated status. Anyone must be able to clone, repoint, and run it identically. (Full statement: `.pi/AGENTS.md` → House rules.)
+
 Confirm with the user which story + ADR + test plan you're implementing. Re-read all three. Run `npm test` first to see actual failures. Then write the smallest code that makes them pass while honoring the ADR. Drill inward with unit tests as you go.
 
 Quality gates (all must be clean before you claim done):

@@ -1,8 +1,12 @@
 # Engineering Team — Catallax Reference Client
 
-This directory is the harness that pi uses when working in this project. It encodes the team's roles, phases, templates, and accumulated decisions/stories/reviews.
+This directory is the harness that pi (and, via `.claude/`, Claude Code) uses when working in this project. It encodes the team's roles, phases, templates, and accumulated decisions/stories/reviews.
 
 Generated on 2026-04-30 via `/skill:init-engineering-team`. Strictness: **Standard**.
+
+## Prime directive
+
+**Catallax is open, permissionless, and Web-of-Trust based.** No pubkey, relay, or arbiter holds special privileges or capabilities — trust is social, derived from the WoT, never granted by the client. Hardcoded defaults (relay URLs, Blossom servers, suggested arbiters, API endpoints) are allowed *only* as bootstrapping conveniences: each must be documented as a default, trivially ENV/config-overridable, and free of any elevated status. Anyone must be able to clone, repoint at their own infrastructure, change the settings, and run it for their own purpose. Every role enforces this; the Reviewer blocks violations. Full statement: [`.pi/AGENTS.md`](../AGENTS.md) → House rules.
 
 ## Layout
 

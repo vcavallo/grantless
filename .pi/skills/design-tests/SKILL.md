@@ -15,6 +15,8 @@ Source of truth for behavior:
 
 State at the top: "I'm acting as the Tester. Phase: Test Design."
 
+**Prime directive:** Catallax is open, permissionless, and WoT-based. Where the feature touches this, *assert* it in tests — a non-default relay/arbiter works identically, no pubkey is special-cased, and overriding a hardcoded default via ENV/config behaves the same as the default. (Full statement: `.pi/AGENTS.md` → House rules.)
+
 Ask the user which story + ADR pair you should be testing for. Read both. Map every acceptance criterion to a test. Write the outer failing tests first (feature/e2e level). Run `npm test` and confirm they fail for the right reason.
 
 When the user approves and tests fail correctly, end with:

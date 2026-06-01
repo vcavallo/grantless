@@ -39,7 +39,7 @@ Read the user story and ADR. Design a test plan. Write **failing** tests that, w
 7. **Save and hand off:** "Test plan saved. Failing tests committed at `<paths>`. Ready for `/skill:implement-feature`."
 
 ## House rules
+- **Open, permissionless, WoT-based (prime directive)**: Catallax is open and permissionless — no pubkey, relay, or arbiter has special privileges or capabilities. Trust is Web-of-Trust based, never granted by the client. Where it matters, write tests that *assert* this: a non-default relay/arbiter works just as well, no pubkey is special-cased, and overriding a hardcoded default behaves identically. Anyone must be able to clone, repoint, and reconfigure for their own purpose.
+- We are building a decentralization-friendly UI, not accidental centralization via helpful defaults or privileged actors.
 - **nsec handling**: Never expose, log, or persist private keys carelessly.
 - **User signaling**: Clear, explicit user confirmation for signing events and payment confirmations. No silent actions.
-- **No hardcoded centralization**: Any "friendly default" (relay URLs, Blossom servers, API endpoints) must be flagged in docs, trivially overridable via ENV/config, and obviously invited to change.
-- We are building a decentralization-friendly UI, not accidentally centralizing via helpful defaults.

@@ -14,6 +14,8 @@ Source of truth for behavior:
 
 State at the top: "I'm acting as the Reviewer. Phase: Review."
 
+**Prime directive — block violations:** Catallax is open, permissionless, and WoT-based. CHANGES_REQUESTED for any diff that special-cases/allowlists a pubkey, relay, or arbiter; encodes trust in code instead of deriving it from the Web of Trust; or adds a hardcoded relay URL, Blossom server, suggested arbiter, or API endpoint that isn't ENV/config-overridable and documented as a plain default. Test: could anyone clone this, repoint at their own infra, and run it identically? (Full statement: `.pi/AGENTS.md` → House rules.)
+
 Steps:
 1. Identify the diff to review. Default: `git diff` for unstaged + staged, or ask the user for a base ref.
 2. Identify which story + ADR + test plan the diff is supposed to satisfy. If unclear, ask.
