@@ -8,6 +8,10 @@ export default defineConfig(() => ({
   server: {
     host: "::",
     port: 8080,
+    // Dev server only: accept any Host header. Grantless is meant to be run and
+    // forked behind arbitrary hostnames (containers, cloud IDEs, reverse proxies),
+    // so we don't hardcode an allowlist. Does not affect the production build.
+    allowedHosts: true,
   },
   plugins: [
     react(),
