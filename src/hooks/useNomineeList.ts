@@ -1,6 +1,8 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
+import { useAppContext } from '@/hooks/useAppContext';
 import { decodeNomineeListNaddr, extractNomineePubkeys } from '@/lib/grantless';
+import { getActiveRelays } from '@/lib/relays';
 
 export type NomineeListStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 export type NomineeListError = 'malformed' | 'unsupported_kind' | 'not_found';
@@ -10,33 +12,43 @@ export interface NomineeListResult {
   pubkeys: string[];
   status: NomineeListStatus;
   error?: NomineeListError;
+  /** Relays this lookup queries — the naddr's hints, else the configured set. */
+  relays: string[];
 }
 
 /**
  * Resolve a pasted list `naddr` (kind 30392 / 30000 / 39089) into its member
- * pubkeys. Reads from the app's configured (overridable) relay. Decode errors
+ * pubkeys.
+ *
+ * The list often lives on relays other than the user's configured one, so we
+ * follow the naddr's own relay hints when present (passed via the query's
+ * `relays` option, which overrides the pool's reqRouter). Hints come from the
+ * user-pasted address, so this stays fully open/permissionless. With no hints
+ * we fall back to the configured (overridable) relay set. Decode errors
  * short-circuit before any query.
  */
 export function useNomineeList(naddr: string | null): NomineeListResult {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
 
   const trimmed = naddr?.trim() ?? '';
   const decoded = trimmed ? decodeNomineeListNaddr(trimmed) : null;
   const decodeError = decoded && 'error' in decoded ? decoded.error : undefined;
   const coord = decoded && !('error' in decoded) ? decoded : null;
 
+  const relays = coord
+    ? coord.relays && coord.relays.length > 0
+      ? coord.relays
+      : getActiveRelays(config, presetRelays)
+    : [];
+
   const query = useQuery({
-    queryKey: ['nominee-list', trimmed],
+    queryKey: ['nominee-list', trimmed, relays],
     queryFn: async (c) => {
-      const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
-      // Follow the naddr's own relay hints to find the list (it may not live on
-      // the user's configured relay). Hints come from the user-pasted address,
-      // so this stays fully open/permissionless. Fall back to the configured
-      // relay when the naddr carries no hints.
-      const opts = coord!.relays?.length ? { signal, relays: coord!.relays } : { signal };
+      const signal = AbortSignal.any([c.signal, AbortSignal.timeout(8000)]);
       const events = await nostr.query(
         [{ kinds: [coord!.kind], authors: [coord!.pubkey], '#d': [coord!.identifier], limit: 1 }],
-        opts,
+        { signal, relays },
       );
       if (events.length === 0) return null;
       // Addressable event: newest version wins.
@@ -44,23 +56,24 @@ export function useNomineeList(naddr: string | null): NomineeListResult {
       return extractNomineePubkeys(latest);
     },
     enabled: !!coord,
-    staleTime: 60_000,
+    staleTime: 0,
+    retry: false,
   });
 
   if (!trimmed) {
-    return { pubkeys: [], status: 'idle' };
+    return { pubkeys: [], status: 'idle', relays };
   }
   if (decodeError) {
-    return { pubkeys: [], status: 'error', error: decodeError };
+    return { pubkeys: [], status: 'error', error: decodeError, relays };
   }
   if (query.isLoading) {
-    return { pubkeys: [], status: 'loading' };
+    return { pubkeys: [], status: 'loading', relays };
   }
   if (query.isError || query.data == null) {
-    return { pubkeys: [], status: 'error', error: 'not_found' };
+    return { pubkeys: [], status: 'error', error: 'not_found', relays };
   }
   if (query.data.length === 0) {
-    return { pubkeys: [], status: 'empty' };
+    return { pubkeys: [], status: 'empty', relays };
   }
-  return { pubkeys: query.data, status: 'ready' };
+  return { pubkeys: query.data, status: 'ready', relays };
 }

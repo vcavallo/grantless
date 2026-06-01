@@ -24,7 +24,7 @@ export function NomineeBrowser() {
   // Auto-load the remembered list on mount.
   const [activeNaddr, setActiveNaddr] = useState(savedNaddr);
 
-  const { pubkeys, status, error } = useNomineeList(activeNaddr || null);
+  const { pubkeys, status, error, relays } = useNomineeList(activeNaddr || null);
   const { data: tasks = [] } = useTaskProposals();
   const tasksByPatron = useMemo(() => groupTasksByPatron(tasks), [tasks]);
 
@@ -57,6 +57,13 @@ export function NomineeBrowser() {
       {status === 'idle' && (
         <p className="text-sm text-muted-foreground">
           Paste a list of pubkeys above to preview its members as Grantless Nominees.
+        </p>
+      )}
+
+      {status !== 'idle' && relays.length > 0 && (
+        <p className="break-all text-xs text-muted-foreground">
+          Querying {relays.length} relay{relays.length === 1 ? '' : 's'} for the list:{' '}
+          <span className="font-mono">{relays.join(', ')}</span>
         </p>
       )}
 
