@@ -37,6 +37,6 @@ Driven entirely by user input (a pasted `naddr`) — no hardcoded or privileged 
 - None outstanding. Resolved during planning: project scope = **all** task proposals (any funding type); ordering = **published `p`-tag order**; persistence = **remember last list** (auto-reload on refresh).
 
 ## Linked artifacts
-- ADR: (filled in after Architecture phase)
+- ADR: `.pi/engineering-team/decisions/0001-minimal-nominee-browser.md`
 - Test plan: (filled in after Test Design phase)
 - Review: (filled in after Review phase)
