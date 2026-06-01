@@ -72,7 +72,37 @@ if (!AbortSignal.timeout) {
     setTimeout(() => {
       controller.abort(new DOMException('The operation was aborted due to timeout', 'TimeoutError'));
     }, milliseconds);
-    
+
     return controller.signal;
+  };
+}
+
+/**
+ * Polyfill for crypto.randomUUID()
+ *
+ * `crypto.randomUUID()` is only exposed in **secure contexts** (HTTPS, or
+ * `localhost`). When the app is served over plain HTTP on a LAN/Tailscale host
+ * — a normal way to run and fork this app — it is `undefined`.
+ *
+ * The Nostr relay layer (`NRelay1`) calls `crypto.randomUUID()` to mint every
+ * subscription ID, so without it **no query ever sends a REQ**: the WebSocket
+ * opens (101) but no frames flow and nothing loads. `crypto.getRandomValues`
+ * *is* available in insecure contexts, so we build a compliant RFC 4122 v4
+ * UUID from it.
+ */
+if (typeof crypto !== 'undefined' && typeof crypto.randomUUID !== 'function') {
+  crypto.randomUUID = function randomUUID(): `${string}-${string}-${string}-${string}-${string}` {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    // RFC 4122 §4.4: set the version (4) and variant (10xx) bits.
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0'));
+    return [
+      hex.slice(0, 4).join(''),
+      hex.slice(4, 6).join(''),
+      hex.slice(6, 8).join(''),
+      hex.slice(8, 10).join(''),
+      hex.slice(10, 16).join(''),
+    ].join('-') as `${string}-${string}-${string}-${string}-${string}`;
   };
 }
