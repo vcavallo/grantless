@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 
-import Index from "./pages/Index";
+import GrantlessBrowse from "./pages/GrantlessBrowse";
 import CatallaxDashboard from "./pages/CatallaxDashboard";
 import { TaskDetail } from "./pages/TaskDetail";
 import About from "./pages/About";
@@ -12,7 +12,7 @@ export function AppRouter() {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<GrantlessBrowse />} />
         <Route path="/catallax" element={<CatallaxDashboard />} />
         <Route path="/task/:nip19" element={<TaskDetail />} />
         <Route path="/about" element={<About />} />
