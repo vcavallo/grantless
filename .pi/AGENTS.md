@@ -88,6 +88,7 @@ Inherited from the reference client (and in flux as that rewrite progresses):
 - All three levels required
 - **Outside-in TDD**: feature/e2e tests written first (failing), then progressively more granular unit tests added as implementation drills inward, then bubble back out until all pass
 - Local relay + nak for anything requiring actual Nostr events — never hit live relays in tests
+- **Prefer real-event end-to-end over mocks.** The point of building on Nostr is that real fixtures are trivial: stand up a local strfry relay, publish real events with `nak`, point the app at it, and drive the real browser. **Do not** write mocked-`useNostr` unit/component tests that assert against fixtures the implementation itself shapes — they're low-signal and brittle. Pure helpers (parsing/formatting in `lib/`) can be plain unit-tested; anything touching the relay/query path should be exercised with real events, not mocks.
 - **Assert the openness properties** where features touch them: a non-default host/relay/arbiter works identically, no pubkey is special-cased, and overriding a hardcoded default behaves the same as the default.
 
 ## Architecture rules
