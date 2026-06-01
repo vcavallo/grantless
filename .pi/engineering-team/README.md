@@ -1,8 +1,10 @@
-# Engineering Team — Catallax Reference Client
+# Engineering Team — Grantless
 
 This directory is the harness that pi (and, via `.claude/`, Claude Code) uses when working in this project. It encodes the team's roles, phases, templates, and accumulated decisions/stories/reviews.
 
-Generated on 2026-04-30 via `/skill:init-engineering-team`. Strictness: **Standard**.
+**Grantless** (*The Invisible Handout*) is a decentralized, crowdfunded grants program for open-source work, built on the Catallax protocol. It is a fork of the Catallax reference client, narrowed to one opinionated use case. See [`.pi/AGENTS.md`](../AGENTS.md) for the full product scope, the OpenSets curation model, and the upstream relationship.
+
+Harness generated on 2026-04-30 via `/skill:init-engineering-team` (inherited from upstream). Strictness: **Standard**.
 
 ## Prime directive
 

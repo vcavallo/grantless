@@ -1,9 +1,14 @@
-# Engineering Team — Claude Code harness
+# Engineering Team — Claude Code harness (Grantless)
 
-This is the **Claude Code** front end for the engineering-team workflow. It drives the
-same harness that the pi version uses: the source of truth for roles, phases, templates,
-and accumulated stories/decisions/reviews lives in `.pi/engineering-team/`. This `.claude/`
-layer just wires that harness into Claude Code's slash commands and subagents.
+This is the **Claude Code** front end for the engineering-team workflow on **Grantless**
+(*The Invisible Handout*) — a decentralized, crowdfunded grants program for open-source work,
+built on the Catallax protocol and forked from the Catallax reference client. See
+[`.pi/AGENTS.md`](../.pi/AGENTS.md) for product scope, the OpenSets curation model, and the
+upstream relationship.
+
+It drives the same harness that the pi version uses: the source of truth for roles, phases,
+templates, and accumulated stories/decisions/reviews lives in `.pi/engineering-team/`. This
+`.claude/` layer just wires that harness into Claude Code's slash commands and subagents.
 
 ## Prime directive
 
