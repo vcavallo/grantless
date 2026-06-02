@@ -1,6 +1,6 @@
 # Story 1: Minimal nominee browser from a pasted list naddr
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-01
 **Type:** Feature
 
@@ -39,4 +39,4 @@ Driven entirely by user input (a pasted `naddr`) — no hardcoded or privileged 
 ## Linked artifacts
 - ADR: `.pi/engineering-team/decisions/0001-minimal-nominee-browser.md`
 - Test plan: `.pi/engineering-team/stories/1-minimal-nominee-browser.test-plan.md` (automated tests deferred; manual browser verification)
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/1-minimal-nominee-browser.md` — **PASS**
