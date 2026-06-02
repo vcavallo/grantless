@@ -35,3 +35,14 @@ documented as a default, ENV/config + UI overridable AND removable, with no spec
 capability. A forker who swaps in their own relay (or removes it) must get an identically
 working app. It is "always-on by default," never "mandatory." Confirm this framing with the
 user before writing the story.
+
+## 2026-06-02 — Grantless MVP epic
+**Raw:** Curator selector via grantless-applicants curation; full test infra (strfry-in-Docker
++ nak e2e + dev seed); TDD the 7 write/browse features; shareable URLs; replaceable-event care.
+**Classified:** Epic → `epics/grantless-mvp.md`. Curation chain resolved (`observer`/`source-tag`
+on kind 30392; validated on `wss://tags.brainstorm.world/relay`). Sequence: test infra →
+dev seed → curator selector → the 7 features. Prod uses hosted Brainstorm; dev fabricates the
+chain with nak.
+**Chores tracked in the epic:** Vercel deploy + grantless.org domain; **stand up / host the live
+`relay.grantless.org` (strfry) in prod**; relay default-relay policy wiring.
+**Next:** `/plan-feature` → Story 2 (test infrastructure).
