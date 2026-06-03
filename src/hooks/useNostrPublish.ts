@@ -6,6 +6,25 @@ import { CATALLAX_KINDS } from "@/lib/catallax";
 
 import type { NostrEvent } from "@nostrify/nostrify";
 
+/**
+ * Publish an event, retrying once on failure. The first write after a cold load can
+ * race the relay websocket (still (re)connecting — e.g. right after a relay-config
+ * change) so `NPool.event`'s `Promise.any` rejects with "No Promise in Promise.any
+ * was resolved". A single retry once the socket is open recovers it. Re-sending the
+ * same signed event is idempotent (relays dedupe by event id), so this is safe.
+ */
+async function publishWithRetry(
+  nostr: { event: (event: NostrEvent, opts?: { signal?: AbortSignal }) => Promise<void> },
+  event: NostrEvent,
+): Promise<void> {
+  try {
+    await nostr.event(event, { signal: AbortSignal.timeout(5000) });
+  } catch {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await nostr.event(event, { signal: AbortSignal.timeout(5000) });
+  }
+}
+
 export function useNostrPublish(): UseMutationResult<NostrEvent> {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
@@ -28,7 +47,7 @@ export function useNostrPublish(): UseMutationResult<NostrEvent> {
           created_at: t.created_at ?? Math.floor(Date.now() / 1000),
         });
 
-        await nostr.event(event, { signal: AbortSignal.timeout(5000) });
+        await publishWithRetry(nostr, event);
         return event;
       } else {
         throw new Error("User is not logged in");

@@ -133,3 +133,14 @@ login button + arbiter-on-detail). Lands before Story 7.
 the Architecture phase (not yet pinned by inspection); arbiter detail-page curator-context is an
 Architect decision; login affordance in the browse header.
 **Status:** → `stories/2.5-browser-e2e-ux-hardening.md` (Approved).
+
+## 2026-06-03 — Fix: retry-once on publish (transient cold-socket write failure)
+**Raw:** User hit "Couldn't assign the arbiter — No Promise in Promise.any was resolved" once
+when changing the arbiter from the task detail page right after a hard refresh + login; worked on
+retry and on the index. Root cause: first write after a cold load races the relay websocket
+(NPool.event → Promise.any over the single local relay → NRelay1.event rejects when the socket
+isn't open/acked within 5s; RelayEnvOverride's resetQueries compounds it). Index warms the socket
+via browse queries first, so it doesn't surface there.
+**Classified:** Bug (obvious) — Implementer + Reviewer. Fix: useNostrPublish wraps nostr.event in
+publishWithRetry (one retry after 600ms; re-sending the same signed event is idempotent — relays
+dedupe by id). Helps all write flows. Gates clean.
