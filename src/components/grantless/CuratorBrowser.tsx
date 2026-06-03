@@ -1,17 +1,24 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { nip19 } from 'nostr-tools';
+import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useApplicantCurationLists } from '@/hooks/useApplicantCurationLists';
 import { useNomineeProfiles } from '@/hooks/useNomineeProfiles';
 import { useTaskProposals } from '@/hooks/useCatallax';
+import { useGoalsProgress } from '@/hooks/useGoalsProgress';
 import {
   applicantsForCurator,
   distinctCurators,
+  filterTasks,
   groupTasksByPatron,
   parseConfiguredCurators,
+  parsePubkey,
+  sortTasks,
 } from '@/lib/grantless';
+import type { TaskProposal } from '@/lib/catallax';
 import { genUserName } from '@/lib/genUserName';
 import { NomineeGrid } from './NomineeGrid';
+import { BrowseControls, type BrowseControlsState } from './BrowseControls';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,18 +43,27 @@ function shortNpub(pubkey: string): string {
 }
 
 /**
- * Browse a curator's vouched-for applicants. Discovers the curators who published
- * a `grantless-applicants` trusted list (plus any configured via
- * VITE_GRANTLESS_CURATORS), lets the viewer pick one, resolves that curator's
- * applicants through the observer/source-tag chain, and renders them with the
- * Story-1 engine. No curator/relay is privileged; the remembered selection is
- * local. Replaces the pasted-naddr demo.
+ * Browse a curator's vouched-for applicants: discover curators, pick one (or deep-link
+ * via `/c/:npub`), resolve their applicants, and render their projects with funding,
+ * filters, and sorts. No curator/relay is privileged.
  */
-export function CuratorBrowser() {
+export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
+  const navigate = useNavigate();
   const { lists, status, relays } = useApplicantCurationLists();
-  const [selected, setSelected] = useLocalStorage<string>(STORAGE_KEY, '');
+  const [savedCurator, setSavedCurator] = useLocalStorage<string>(STORAGE_KEY, '');
 
-  // Curators = configured (overridable, empty by default) ∪ discovered observers.
+  // A curator in the URL (e.g. /c/:npub) wins over the remembered one; remember it too.
+  const routeCurator = curatorNpub ? parsePubkey(curatorNpub) : null;
+  const selected = routeCurator ?? savedCurator;
+  useEffect(() => {
+    if (routeCurator && routeCurator !== savedCurator) setSavedCurator(routeCurator);
+  }, [routeCurator, savedCurator, setSavedCurator]);
+
+  const selectCurator = (pubkey: string) => {
+    setSavedCurator(pubkey);
+    navigate(`/c/${nip19.npubEncode(pubkey)}`);
+  };
+
   const configured = useMemo(
     () => parseConfiguredCurators(import.meta.env.VITE_GRANTLESS_CURATORS),
     [],
@@ -75,8 +91,40 @@ export function CuratorBrowser() {
   const tasksByPatron = useMemo(() => groupTasksByPatron(tasks), [tasks]);
   const { data: applicantProfiles } = useNomineeProfiles(applicants, relays);
 
-  const curatorLabel = (pubkey: string) =>
-    curatorProfiles?.get(pubkey)?.name ?? genUserName(pubkey);
+  // Batch-fetch funding for every goal'd project of the selected curator's applicants.
+  const goalIds = useMemo(() => {
+    const ids: string[] = [];
+    for (const a of applicants) {
+      for (const t of tasksByPatron.get(a) ?? []) {
+        if (t.goalId) ids.push(t.goalId);
+      }
+    }
+    return ids;
+  }, [applicants, tasksByPatron]);
+  const { progressByGoal } = useGoalsProgress(goalIds);
+
+  const [controls, setControls] = useState<BrowseControlsState>({
+    statuses: ['proposed', 'funded', 'in_progress', 'submitted'], // concluded hidden by default
+    sort: 'newest',
+    seekingFunding: false,
+    needsWorker: false,
+    hideEmpty: false,
+  });
+
+  const filteredByPatron = useMemo(() => {
+    const map = new Map<string, TaskProposal[]>();
+    const filter = { statuses: controls.statuses, seekingFunding: controls.seekingFunding, needsWorker: controls.needsWorker };
+    for (const a of applicants) {
+      map.set(a, sortTasks(filterTasks(tasksByPatron.get(a) ?? [], filter, progressByGoal), controls.sort, progressByGoal));
+    }
+    return map;
+  }, [applicants, tasksByPatron, controls, progressByGoal]);
+
+  const applicantsToShow = controls.hideEmpty
+    ? applicants.filter((a) => (filteredByPatron.get(a)?.length ?? 0) > 0)
+    : applicants;
+
+  const curatorLabel = (pubkey: string) => curatorProfiles?.get(pubkey)?.name ?? genUserName(pubkey);
 
   if (status === 'loading') {
     return (
@@ -127,7 +175,7 @@ export function CuratorBrowser() {
     <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="curator-select">Browse a curator</Label>
-        <Select value={selected} onValueChange={setSelected}>
+        <Select value={selected} onValueChange={selectCurator}>
           <SelectTrigger id="curator-select" className="w-full max-w-sm">
             <SelectValue placeholder="Choose a curator…" />
           </SelectTrigger>
@@ -166,7 +214,15 @@ export function CuratorBrowser() {
       )}
 
       {selected && applicants.length > 0 && (
-        <NomineeGrid pubkeys={applicants} tasksByPatron={tasksByPatron} profiles={applicantProfiles} />
+        <>
+          <BrowseControls {...controls} onChange={(patch) => setControls((c) => ({ ...c, ...patch }))} />
+          <NomineeGrid
+            pubkeys={applicantsToShow}
+            tasksByPatron={filteredByPatron}
+            profiles={applicantProfiles}
+            progressByGoal={progressByGoal}
+          />
+        </>
       )}
     </div>
   );

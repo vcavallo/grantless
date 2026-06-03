@@ -153,6 +153,9 @@ interface TaskOpts {
   fundingType?: string;
   goalId?: string;
   createdAt?: number;
+  title?: string;
+  description?: string;
+  requirements?: string;
 }
 
 export function publishTask(relay: string, o: TaskOpts): { id: string } {
@@ -165,7 +168,11 @@ export function publishTask(relay: string, o: TaskOpts): { id: string } {
   if (o.goalId) tags.push(['goal', o.goalId]);
   return publish(relay, {
     kind: 33401,
-    content: JSON.stringify({ title: 'Test Task', description: 'desc', requirements: 'reqs' }),
+    content: JSON.stringify({
+      title: o.title ?? 'Test Task',
+      description: o.description ?? 'desc',
+      requirements: o.requirements ?? 'reqs',
+    }),
     tags,
     sec: o.sec,
     createdAt: o.createdAt,

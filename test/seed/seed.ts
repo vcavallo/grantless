@@ -170,6 +170,8 @@ async function seedProject(
     arbiterService,
     amount: spec.amount,
     fundingType: 'crowdfunding',
+    title: spec.title,
+    description: `${spec.title} — a seeded Grantless project.`,
   });
 
   for (let i = 0; i <= targetIndex; i++) {

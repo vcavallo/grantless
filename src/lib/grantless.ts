@@ -1,6 +1,6 @@
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
-import type { ArbiterAnnouncement, TaskProposal } from '@/lib/catallax';
+import type { ArbiterAnnouncement, GoalProgress, TaskProposal, TaskStatus } from '@/lib/catallax';
 
 /**
  * Kinds whose `p` tags we treat as a list of "Grantless Nominee" pubkeys.
@@ -238,4 +238,60 @@ export function selectArbiterCandidates(
     });
   }
   return candidates;
+}
+
+// ---- Browse filtering & sorting (Story 11) ----
+
+export type TaskSort = 'newest' | 'funding' | 'amount';
+
+export interface TaskFilter {
+  /** Statuses to show. */
+  statuses: TaskStatus[];
+  /** Only tasks with a goal that isn't met yet. */
+  seekingFunding: boolean;
+  /** Only `funded` tasks with no worker assigned. */
+  needsWorker: boolean;
+}
+
+/** Funding percent for sorting; tasks with no goal/progress sort last (-1). Pure. */
+function fundingPct(task: TaskProposal, progressByGoal: Map<string, GoalProgress>): number {
+  const p = task.goalId ? progressByGoal.get(task.goalId) : undefined;
+  return p ? p.percentComplete : -1;
+}
+
+/** Filter a curator's tasks by status + the semantic toggles. Pure. */
+export function filterTasks(
+  tasks: TaskProposal[],
+  filter: TaskFilter,
+  progressByGoal: Map<string, GoalProgress>,
+): TaskProposal[] {
+  return tasks.filter((task) => {
+    if (!filter.statuses.includes(task.status)) return false;
+    if (filter.seekingFunding) {
+      const p = task.goalId ? progressByGoal.get(task.goalId) : undefined;
+      if (!p || p.isGoalMet) return false;
+    }
+    if (filter.needsWorker && (task.status !== 'funded' || task.workerPubkey)) return false;
+    return true;
+  });
+}
+
+/** Sort tasks by the chosen key (returns a new array). Pure. */
+export function sortTasks(
+  tasks: TaskProposal[],
+  sort: TaskSort,
+  progressByGoal: Map<string, GoalProgress>,
+): TaskProposal[] {
+  const sorted = [...tasks];
+  if (sort === 'amount') {
+    sorted.sort((a, b) => (parseInt(b.amount, 10) || 0) - (parseInt(a.amount, 10) || 0));
+  } else if (sort === 'funding') {
+    sorted.sort((a, b) => {
+      const d = fundingPct(b, progressByGoal) - fundingPct(a, progressByGoal);
+      return d !== 0 ? d : b.created_at - a.created_at;
+    });
+  } else {
+    sorted.sort((a, b) => b.created_at - a.created_at); // newest
+  }
+  return sorted;
 }

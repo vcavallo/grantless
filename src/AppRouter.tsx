@@ -13,6 +13,7 @@ export function AppRouter() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<GrantlessBrowse />} />
+        <Route path="/c/:npub" element={<GrantlessBrowse />} />
         <Route path="/catallax" element={<CatallaxDashboard />} />
         <Route path="/task/:nip19" element={<TaskDetail />} />
         <Route path="/about" element={<About />} />

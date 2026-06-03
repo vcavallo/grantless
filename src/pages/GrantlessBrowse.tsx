@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { CuratorBrowser } from '@/components/grantless/CuratorBrowser';
 import { CreateProjectDialog } from '@/components/grantless/CreateProjectDialog';
@@ -6,6 +6,7 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 
 export default function GrantlessBrowse() {
+  const { npub } = useParams<{ npub: string }>();
   return (
     <>
       <Helmet>
@@ -32,7 +33,7 @@ export default function GrantlessBrowse() {
             <p className="text-xl text-muted-foreground">The Invisible Handout.</p>
           </header>
 
-          <CuratorBrowser />
+          <CuratorBrowser curatorNpub={npub} />
         </div>
       </div>
     </>
