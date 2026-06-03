@@ -93,3 +93,17 @@ showed data in-browser. (Supersedes the earlier localStorage/Tailscale theories.
 plugin (apply:'serve') adds `ws:` to connect-src via transformIndexHtml; the production
 build's CSP stays strict (wss: only). Verified: dev index has ws:, dist/index.html does
 not. Belongs to Story 3's local-relay dev infra. Gates clean.
+
+## 2026-06-03 — Create a project (first write flow)
+**Raw:** Continue the epic — Story 5. Run all engineering-team phases autonomously;
+user checks in after the final review.
+**Classified:** Feature (first write flow). Standard strictness → full phase path.
+A logged-in grantee posts a crowdfunding kind-33401 task in status `proposed`, authored
+by themselves (patron = first p tag), t:catallax — minimal slice, NO arbiter and NO 9041
+goal (those are Stories 6–7). Surfaces under the grantee in the Story-4 curator browse.
+A full TaskProposalForm exists on /catallax but requires an arbiter + creates the goal
+(folds in Stories 6–7), so Story 5 needs the minimal slice.
+**Decisions for the autonomous run:** no arbiter at creation (Story 6); no goal at creation
+(Story 7); funding_type fixed to crowdfunding; form reachable from the Grantless browse when
+logged in (Architect picks dialog vs route + reuse vs fresh).
+**Status:** → `stories/5-create-project.md` (Approved).
