@@ -23,11 +23,15 @@ const queryClient = new QueryClient({
   },
 });
 
-const defaultConfig: AppConfig = {
-  theme: "light",
-  relayUrl: "wss://relay.primal.net",
-  relayMode: "default",
-};
+// Optional dev convenience: point the app at one relay via VITE_RELAY_URL
+// (e.g. the local strfry seeded by `npm run seed`). Unset by default → the normal
+// default relay below is used and behavior is unchanged. No relay is privileged;
+// this is a plain, overridable bootstrapping default (Grantless prime directive).
+const envRelay: string | undefined = import.meta.env.VITE_RELAY_URL?.trim() || undefined;
+
+const defaultConfig: AppConfig = envRelay
+  ? { theme: "light", relayUrl: envRelay, relayMode: "custom", customRelay: envRelay }
+  : { theme: "light", relayUrl: "wss://relay.primal.net", relayMode: "default" };
 
 const presetRelays = [
   { url: 'wss://ditto.pub/relay', name: 'Ditto' },

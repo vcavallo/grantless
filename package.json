@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm i && npm run relay:up && vite",
+    "dev": "npm i && npm run relay:up && npm run seed && VITE_RELAY_URL=${VITE_RELAY_URL:-ws://127.0.0.1:7787} vite",
     "build": "npm i && vite build && cp dist/index.html dist/404.html",
     "test": "npm i && tsc -p tsconfig.app.json --noEmit && eslint && vitest run && vite build",
     "test:e2e": "vitest run -c vitest.e2e.config.ts",
+    "seed": "vite-node test/seed/run.ts",
     "relay:up": "docker compose -f relay/docker-compose.yml up -d",
     "relay:down": "docker compose -f relay/docker-compose.yml down -v",
     "deploy": "npm run build && npx -y nostr-deploy-cli deploy --skip-setup",
