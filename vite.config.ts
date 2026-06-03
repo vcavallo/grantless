@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import react from "@vitejs/plugin-react-swc";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
@@ -20,6 +20,9 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    // The Docker/strfry + nak e2e suite runs under vitest.e2e.config.ts
+    // (`npm run test:e2e`), never in the fast unit gate.
+    exclude: [...configDefaults.exclude, 'test/e2e/**'],
     onConsoleLog(log) {
       return !log.includes("React Router Future Flag Warning");
     },
