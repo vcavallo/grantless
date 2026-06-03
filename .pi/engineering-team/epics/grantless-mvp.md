@@ -95,6 +95,16 @@ Playwright browser-e2e is desired; fold it into Story 2 if cheap, else a fast-fo
 - **`relay.grantless.org` default-relay policy wiring** — the code that adds our relay to the read/write set for Catallax events (overridable). Small; fold into the relay work or a tiny story when the prod relay exists. (Previously queued in `stories/_intake.md`.)
 - **Negentropy sync from a live relay (later).** Set up local **negentropy sync** so our local strfry can "pull down" real tags / 30392s / Catallax events from a live relay (e.g. `tags.brainstorm.world`) for dev/browse without re-authoring them. strfry has built-in negentropy `sync`, so this is mostly wiring a sync command/target — a fast way to mirror real curation data locally. Not now; do after the test harness + seed exist.
 
+- **About page — replace the "Catallax dashboard" link (pre-deploy).** Before going live, swap the header's "Catallax dashboard" link for an **"About"** link → a new About page. It should be a **scoped version of the Catallax about**: explain at a high level *how Grantless works and the principles underneath it*. Cover:
+  - **dlists** (decentralized/curated lists — the 30392/30000 OpenSets), **Web of Trust (WoT)**, and **point-of-view (PoV)** — i.e. trust is the viewer's, derived from who they follow/curate, never granted by the app.
+  - A joke that **"OpenSets" (dlists) are more powerful and permissionless than "OpenSats"** — doing the inverse of the managed-fund playbook.
+  - The **decentralization ladder**, and where Grantless sits:
+    1. **Just have alternatives** — more grant bodies than OpenSats, but each still centralized.
+    2. **A forkable platform** — anyone can fork it to deploy their own alternative (no interop between versions).
+    3. **A single protocol** — anyone can permissionlessly author events that act like a grant body, using their own UI, relay, and hand-crafted "who to trust" list (maybe moderated events to display).
+    4. **An open curation system** — anyone can be a curator; a user's trust graph determines their point of view; one UI works for anyone against any relay (their own or a "centralized" one) for their own goals. No forks, no hardcoded lists, no central moderation.
+  - Make the point: **Grantless is already at stage 4.** We ship a **default relay for convenience**, but you're free to point at any relay you want — and any curator, including yourself.
+
 ## Out of epic (deferred)
 
 - **Gig-level** curation (we curate at the applicant-profile level); multi-curator union views; encryption of curation events.
