@@ -1,6 +1,6 @@
 # Story 4: Curator selector + real applicant view
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature
 
@@ -46,4 +46,4 @@ Resolved during planning (decisions for the autonomous run, grounded in the epic
 - Builds on: Story 1 (engine) `stories/1-minimal-nominee-browser.md` + ADR 0001; Story 2 (harness/resolver shape) ADR 0002; Story 3 (seeded curator/applicant data) `stories/3-dev-seed.md`
 - ADR: `.pi/engineering-team/decisions/0004-curator-selector.md`
 - Test plan: `.pi/engineering-team/stories/4-curator-selector.test-plan.md`
-- Review: `.pi/engineering-team/reviews/4-curator-selector.md`
+- Review: `.pi/engineering-team/reviews/4-curator-selector.md` — **PASS**
