@@ -1,6 +1,6 @@
 # Story 3: Dev seed — a fixed, browsable local dataset
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature (infrastructure)
 
@@ -48,4 +48,4 @@ Resolved during planning (decisions made for an autonomous run, per the epic's d
 - Builds on: `.pi/engineering-team/stories/2-test-infrastructure.md` + `.pi/engineering-team/decisions/0002-test-infrastructure.md` (relay + harness)
 - ADR: `.pi/engineering-team/decisions/0003-dev-seed.md`
 - Test plan: `.pi/engineering-team/stories/3-dev-seed.test-plan.md`
-- Review: `.pi/engineering-team/reviews/3-dev-seed.md`
+- Review: `.pi/engineering-team/reviews/3-dev-seed.md` — **PASS**
