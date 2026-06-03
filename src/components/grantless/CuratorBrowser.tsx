@@ -166,7 +166,7 @@ export function CuratorBrowser() {
       )}
 
       {selected && applicants.length > 0 && (
-        <NomineeGrid pubkeys={applicants} tasksByPatron={tasksByPatron} profiles={applicantProfiles} />
+        <NomineeGrid pubkeys={applicants} tasksByPatron={tasksByPatron} profiles={applicantProfiles} curatorPubkey={selected} />
       )}
     </div>
   );

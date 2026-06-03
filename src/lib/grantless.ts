@@ -1,6 +1,6 @@
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
-import type { TaskProposal } from '@/lib/catallax';
+import type { ArbiterAnnouncement, TaskProposal } from '@/lib/catallax';
 
 /**
  * Kinds whose `p` tags we treat as a list of "Grantless Nominee" pubkeys.
@@ -82,6 +82,9 @@ export function groupTasksByPatron(tasks: TaskProposal[]): Map<string, TaskPropo
 
 /** The tag slug whose curated set is the list of eligible Grantless applicants. */
 export const GRANTLESS_APPLICANTS_SLUG = 'grantless-applicants';
+
+/** The tag slug whose curated set is the list of arbiters a curator vouches for. */
+export const GRANTLESS_ARBITER_SLUG = 'grantless-arbiter';
 
 export interface CurationList {
   /** The curator / point-of-view this list belongs to. */
@@ -181,4 +184,41 @@ export function parseConfiguredCurators(raw: string | undefined): string[] {
     }
   }
   return result;
+}
+
+/** An arbiter offerable for selection: a curator-vouched pubkey that has a 33400
+ *  service announcement (so a service coordinate exists to reference). */
+export interface ArbiterCandidate {
+  pubkey: string;
+  /** `d` of the chosen 33400 announcement. */
+  serviceD: string;
+  /** `33400:<pubkey>:<serviceD>` — the task's `a` tag. */
+  serviceCoord: string;
+  /** Display name from the announcement, if any. */
+  name?: string;
+}
+
+/**
+ * Cross-reference a curator's `grantless-arbiter` member pubkeys with the arbiter
+ * announcements (kind 33400) to produce selectable candidates. A member is offerable
+ * only if it has at least one announcement; the latest (`created_at`) is used.
+ * Order follows `memberPubkeys`. Pure.
+ */
+export function selectArbiterCandidates(
+  memberPubkeys: string[],
+  announcements: ArbiterAnnouncement[],
+): ArbiterCandidate[] {
+  const candidates: ArbiterCandidate[] = [];
+  for (const pubkey of memberPubkeys) {
+    const mine = announcements.filter((a) => a.arbiterPubkey === pubkey);
+    if (mine.length === 0) continue;
+    const latest = mine.reduce((a, b) => (b.created_at > a.created_at ? b : a));
+    candidates.push({
+      pubkey,
+      serviceD: latest.d,
+      serviceCoord: `33400:${latest.arbiterPubkey}:${latest.d}`,
+      name: latest.content.name,
+    });
+  }
+  return candidates;
 }

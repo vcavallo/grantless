@@ -328,6 +328,32 @@ export function buildTaskProposalTemplate(
   return { kind: CATALLAX_KINDS.TASK_PROPOSAL, content: JSON.stringify(content), tags };
 }
 
+/**
+ * Reconstruct the builder input from a parsed task proposal, so an existing task
+ * can be re-published with one field changed:
+ *   `buildTaskProposalTemplate({ ...taskProposalToInput(task), arbiterPubkey, arbiterService })`.
+ * This is the re-publish primitive every status-transition / assignment flow reuses.
+ */
+export function taskProposalToInput(task: TaskProposal): TaskProposalInput {
+  return {
+    d: task.d,
+    patronPubkey: task.patronPubkey,
+    title: task.content.title,
+    description: task.content.description,
+    requirements: task.content.requirements,
+    amount: task.amount,
+    status: task.status,
+    fundingType: task.fundingType,
+    arbiterPubkey: task.arbiterPubkey,
+    arbiterService: task.arbiterService,
+    workerPubkey: task.workerPubkey,
+    goalId: task.goalId,
+    detailsUrl: task.detailsUrl,
+    categories: task.categories,
+    deadline: task.content.deadline,
+  };
+}
+
 export function generateServiceId(name: string): string {
   const slug = name
     .toLowerCase()
