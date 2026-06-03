@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { NomineeBrowser } from '@/components/grantless/NomineeBrowser';
+import { CuratorBrowser } from '@/components/grantless/CuratorBrowser';
 import { Button } from '@/components/ui/button';
 
 export default function GrantlessBrowse() {
@@ -26,7 +26,7 @@ export default function GrantlessBrowse() {
             <p className="text-xl text-muted-foreground">The Invisible Handout.</p>
           </header>
 
-          <NomineeBrowser />
+          <CuratorBrowser />
         </div>
       </div>
     </>
