@@ -144,3 +144,15 @@ via browse queries first, so it doesn't surface there.
 **Classified:** Bug (obvious) — Implementer + Reviewer. Fix: useNostrPublish wraps nostr.event in
 publishWithRetry (one retry after 600ms; re-sending the same signed event is idempotent — relays
 dedupe by id). Helps all write flows. Gates clean.
+
+## 2026-06-03 — Role-based task management on the detail page [Story 6.5]
+**Raw:** /plan-feature — full "CRUD" / role-based task management on /task/:naddr for Patron,
+Arbiter, Worker; every action needed for the full Catallax loop (currently only Patron change-
+arbiter exists). Crowdfunding/contribution + real payments stay Story 7.
+**Classified:** Feature. Standard → full phase path. Folds epic Stories 8–10 (assign worker /
+mark submitted / conclude) into one detail-page management story. Numbered 6.5 (before epic
+Story 7), per the 2.5 precedent.
+**Planning decisions:** lifecycle + role assignments only (no field editing); include manual
+"mark funded" (patron/arbiter); conclusion uses a mocked payout/refund receipt; worker assigned
+by patron (self-assign allowed); cancel = arbiter 3402 cancelled/abandoned.
+**Status:** → `stories/6.5-task-management-detail-page.md` (Approved). Running all phases.
