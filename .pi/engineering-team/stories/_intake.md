@@ -59,3 +59,16 @@ status); nsecs loadable into a signer; run + teardown. Builds on Story 2's relay
 surfaced via a roster fixture + printed on run; optional `VITE_RELAY_URL` (unset by default) so
 `npm run dev` can auto-point the app at the local relay.
 **Status:** → `stories/3-dev-seed.md` (Approved).
+
+## 2026-06-03 — Curator selector + real applicant view
+**Raw:** Continue the epic — Story 4. Run all engineering-team phases autonomously;
+user checks in after the final review.
+**Classified:** Feature. Standard strictness → full phase path
+(Plan → Architecture → Test Design → Implement → Review). First TDD'd product feature.
+Replaces Story 1's paste-a-list demo: discover curators → pick one → resolve their
+`grantless-applicants` 30392 via observer/source-tag → render with Story 1's engine.
+Builds on Stories 1 (engine), 2 (harness/resolver shape), 3 (seeded curator/applicant data).
+**Decisions for the autonomous run:** curators sourced via discovery (distinct observers of
+grantless-applicants TLs) + optional empty-by-default configurable list; paste-naddr path
+superseded; curator-in-URL deferred to Story 11.
+**Status:** → `stories/4-curator-selector.md` (Approved).
