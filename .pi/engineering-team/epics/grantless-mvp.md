@@ -93,6 +93,7 @@ Playwright browser-e2e is desired; fold it into Story 2 if cheap, else a fast-fo
 - **Vercel deploy + `grantless.org` domain** — gated on a deployable artifact; Story 1 already qualifies, so this can happen any time we want a live preview.
 - **Stand up / host the live `relay.grantless.org`** (strfry) in prod — the always-on Catallax relay. Needed before the prod relay-policy is meaningful; the same strfry image used in Story 2's Docker setup can inform it.
 - **`relay.grantless.org` default-relay policy wiring** — the code that adds our relay to the read/write set for Catallax events (overridable). Small; fold into the relay work or a tiny story when the prod relay exists. (Previously queued in `stories/_intake.md`.)
+- **Negentropy sync from a live relay (later).** Set up local **negentropy sync** so our local strfry can "pull down" real tags / 30392s / Catallax events from a live relay (e.g. `tags.brainstorm.world`) for dev/browse without re-authoring them. strfry has built-in negentropy `sync`, so this is mostly wiring a sync command/target — a fast way to mirror real curation data locally. Not now; do after the test harness + seed exist.
 
 ## Out of epic (deferred)
 
