@@ -46,3 +46,16 @@ chain with nak.
 **Chores tracked in the epic:** Vercel deploy + grantless.org domain; **stand up / host the live
 `relay.grantless.org` (strfry) in prod**; relay default-relay policy wiring.
 **Next:** `/plan-feature` → Story 2 (test infrastructure).
+
+## 2026-06-03 — Dev seed
+**Raw:** Continue the epic — Story 3 (dev seed). Run all engineering-team phases autonomously;
+user checks in after the final review.
+**Classified:** Feature (infrastructure). Standard strictness → full phase path
+(Plan → Architecture → Test Design → Implement → Review). Scope is well-specified by the epic's
+Story 3 row: fixed nsecs (1 curator, 2 applicants, 1 worker, 3 funders, 2 arbiters + a list-
+publishing agent); full historical data (applicant + arbiter 30392s, projects across every
+status); nsecs loadable into a signer; run + teardown. Builds on Story 2's relay + harness.
+**Decisions for the autonomous run:** fixed keys committed as labeled dev-only fixtures; nsecs
+surfaced via a roster fixture + printed on run; optional `VITE_RELAY_URL` (unset by default) so
+`npm run dev` can auto-point the app at the local relay.
+**Status:** → `stories/3-dev-seed.md` (Approved).
