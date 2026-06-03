@@ -1,6 +1,6 @@
 # Story 2: Test infrastructure — local relay + e2e harness
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-02
 **Type:** Feature (infrastructure)
 
@@ -37,4 +37,4 @@ The local relay is a **dev/test-only** resource, never a prod default or privile
 - Epic: `.pi/engineering-team/epics/grantless-mvp.md`
 - ADR: `.pi/engineering-team/decisions/0002-test-infrastructure.md`
 - Test plan: (filled in after Test Design phase)
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/2-test-infrastructure.md` — **PASS**
