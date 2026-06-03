@@ -181,3 +181,13 @@ list filters the arbiter options.
 [Erin] — vs Cleo's [Alice,Bob]/[Dave,Erin]. seed.e2e asserts the second curator's sets differ;
 a new Playwright test asserts the detail-page arbiter options follow the remembered curator
 (under Quinn: Erin present, Dave absent). Gates + e2e (30) + Playwright (13) clean.
+
+## 2026-06-03 — Contribute to a crowdfund [Story 7]
+**Raw:** Continue the epic — Story 7. Run all phases autonomously; check in at the final review.
+**Classified:** Feature. Standard → full phase path. A funder contributes (mocked) toward a task's
+NIP-75 9041 zap goal; funding progress shown. Adds "open for funding" (patron creates the 9041
+once an arbiter exists) + "contribute" (mocked 9735 to the goal) + progress display. Reuses
+calculateGoalProgress / buildGoalEventTags / buildMockZapReceiptTemplate / useZapGoal.
+**Decisions:** goal created on patron "open for funding" (needs arbiter), not at task creation;
+anyone may contribute; payments mocked; reaching the goal is surfaced, mark-funded stays manual.
+**Status:** → `stories/7-contribute-to-crowdfund.md` (Approved). Running all phases.
