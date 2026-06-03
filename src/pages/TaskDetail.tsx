@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
@@ -19,9 +18,7 @@ import { useCatallaxInvalidation } from '@/hooks/useCatallax';
 import { genUserName } from '@/lib/genUserName';
 import { RelaySelector } from '@/components/RelaySelector';
 import { CopyNpubButton } from '@/components/CopyNpubButton';
-import { GoalProgressBar } from '@/components/catallax/GoalProgressBar';
-import { ContributorsList } from '@/components/catallax/ContributorsList';
-import { CrowdfundButton } from '@/components/catallax/CrowdfundButton';
+import { CrowdfundSection } from '@/components/grantless/CrowdfundSection';
 
 export function TaskDetail() {
   const { nip19: nip19Param } = useParams<{ nip19: string }>();
@@ -32,7 +29,6 @@ export function TaskDetail() {
   const { invalidateAllCatallaxQueries } = useCatallaxInvalidation();
   // Curator context for the arbiter options on this (non-curator-scoped) page.
   const [rememberedCurator] = useLocalStorage<string>('grantless:lastCurator', '');
-  const [waitingForPayment, setWaitingForPayment] = useState(false);
 
   // Decode the naddr to get task details
   const taskAddress = nip19Param ? (() => {
@@ -417,31 +413,16 @@ export function TaskDetail() {
 
             </div>
 
-            {/* Crowdfunding Progress */}
-            {task.fundingType === 'crowdfunding' && task.goalId && (
-              <div>
-                <h3 className="font-medium mb-2">Crowdfunding Progress</h3>
-                <Card>
-                  <CardContent className="p-4 space-y-4">
-                    <GoalProgressBar
-                      goalId={task.goalId}
-                      waitingForPayment={waitingForPayment}
-                      onWaitingComplete={() => setWaitingForPayment(false)}
-                    />
-
-                    {task.status === 'proposed' && (
-                      <CrowdfundButton
-                        task={task}
-                        realZapsEnabled={true}
-                        onPaymentComplete={() => setWaitingForPayment(true)}
-                      />
-                    )}
-
-                    <ContributorsList goalId={task.goalId} />
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+            {/* Crowdfunding (Grantless: open for funding, contribute, progress) */}
+            <CrowdfundSection
+              task={task}
+              onUpdate={() => {
+                invalidateAllCatallaxQueries();
+                queryClient.invalidateQueries({
+                  queryKey: ['task-detail', taskAddress?.pubkey, taskAddress?.identifier],
+                });
+              }}
+            />
 
             {/* Categories */}
             {task.categories.length > 0 && (

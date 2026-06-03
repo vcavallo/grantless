@@ -532,6 +532,24 @@ export function buildGoalEventTags(
   ];
 }
 
+/**
+ * Build a NIP-75 zap-goal (kind 9041) event template for a task's crowdfund: target
+ * = `amount` sats (stored as msats), `zap` = the arbiter (escrow recipient), `a` =
+ * the task coordinate, `relays` = where contributions/receipts live. Pure.
+ */
+export function buildZapGoalTemplate(
+  task: { title: string; description: string; amount: string; d: string },
+  patronPubkey: string,
+  arbiterPubkey: string,
+  relays: string[],
+): { kind: number; content: string; tags: string[][] } {
+  return {
+    kind: 9041,
+    content: `Crowdfunding goal for: ${task.title}`,
+    tags: buildGoalEventTags(task, patronPubkey, arbiterPubkey, relays),
+  };
+}
+
 export function parseZapReceiptAmount(receipt: NostrEvent): number {
   // Per NIP-57, the amount is in the zap request inside the description tag
   const descTag = receipt.tags.find(([name]) => name === 'description');
