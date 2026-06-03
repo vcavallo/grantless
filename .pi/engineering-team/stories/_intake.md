@@ -72,3 +72,13 @@ Builds on Stories 1 (engine), 2 (harness/resolver shape), 3 (seeded curator/appl
 grantless-applicants TLs) + optional empty-by-default configurable list; paste-naddr path
 superseded; curator-in-URL deferred to Story 11.
 **Status:** → `stories/4-curator-selector.md` (Approved).
+
+## 2026-06-03 — Fix: VITE_RELAY_URL ignored for returning users
+**Raw:** During Story 4 manual verification, `npm run dev` showed "No curators found" —
+the app queried a stale relay. Root cause: `VITE_RELAY_URL` was only the *default* for
+empty localStorage, so AppProvider's persisted `nostr:app-config` won over it for anyone
+who'd used the app before. The seed→browse flow was silently broken for returning users.
+**Classified:** Bug (obvious) — Standard strictness → Implementer + Reviewer (skip
+Architecture). Fix: `RelayEnvOverride` makes `VITE_RELAY_URL` authoritative on load when
+set (overrides persisted relay → custom/customRelay), no-op when unset. Belongs to Story 3's
+`VITE_RELAY_URL` feature. Gates clean; manual-verify (UI, per the feature's nature).
