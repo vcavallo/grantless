@@ -73,7 +73,7 @@ describe('task lifecycle via the app builders (real events on local strfry)', ()
     const submitted = await latest();
     // 1) mocked payout receipt to the worker
     const payout = publishTmpl(
-      buildMockZapReceiptTemplate({ senderPubkey: arbiter.pub, recipient: worker.pub, amountSats: 50000, referencedId: taskCoord }),
+      buildMockZapReceiptTemplate({ senderPubkey: arbiter.pub, recipient: worker.pub, amountSats: 50000, referencedId: submitted.id }),
       arbiter.sec,
     );
     // 2) the 3402 conclusion referencing the task + payout

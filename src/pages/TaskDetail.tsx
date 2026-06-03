@@ -12,11 +12,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Copy, ExternalLink, ArrowLeft, Calendar, Bitcoin, User, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { AssignArbiterControl } from '@/components/grantless/AssignArbiterControl';
-import { TaskManagement } from '@/components/catallax/TaskManagement';
-import { CATALLAX_KINDS, parseTaskProposal, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
+import { TaskLifecycleActions } from '@/components/grantless/TaskLifecycleActions';
+import { CATALLAX_KINDS, latestAuthoritativeTask, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
 import { useCatallaxInvalidation } from '@/hooks/useCatallax';
 import { genUserName } from '@/lib/genUserName';
 import { RelaySelector } from '@/components/RelaySelector';
@@ -32,7 +30,6 @@ export function TaskDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { invalidateAllCatallaxQueries } = useCatallaxInvalidation();
-  const { user } = useCurrentUser();
   // Curator context for the arbiter options on this (non-curator-scoped) page.
   const [rememberedCurator] = useLocalStorage<string>('grantless:lastCurator', '');
   const [waitingForPayment, setWaitingForPayment] = useState(false);
@@ -56,31 +53,17 @@ export function TaskDetail() {
       if (!taskAddress) return null;
 
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(10000)]);
+      // Query by #d only (NOT authors): a worker/arbiter-signed status update is a
+      // replaceable event at a *different* coordinate than the patron's, so an
+      // authors:[patron] filter would miss it. latestAuthoritativeTask applies the
+      // authorized-updater rule + latest-wins across signers.
       const events = await nostr.query([{
         kinds: [CATALLAX_KINDS.TASK_PROPOSAL],
-        authors: [taskAddress.pubkey],
         '#d': [taskAddress.identifier],
-        limit: 100, // Get many more versions to ensure we have the latest
+        limit: 100,
       }], { signal });
 
-      if (events.length === 0) return null;
-
-      // Parse all events and find the latest version
-      const parsedTasks = events
-        .map(parseTaskProposal)
-        .filter((task): task is TaskProposal => task !== null);
-
-      if (parsedTasks.length === 0) return null;
-
-      // For replaceable events, return the one with the latest created_at
-      const latestTask = parsedTasks.reduce((latest, current) =>
-        current.created_at > latest.created_at ? current : latest
-      );
-
-      console.log('TaskDetail: Found', events.length, 'versions, latest status:', latestTask.status, 'created_at:', latestTask.created_at);
-      console.log('TaskDetail: All versions:', parsedTasks.map(t => ({ created_at: t.created_at, status: t.status, id: t.id.slice(0, 8) })).sort((a, b) => b.created_at - a.created_at));
-
-      return latestTask;
+      return latestAuthoritativeTask(events, taskAddress.pubkey, taskAddress.identifier);
     },
     enabled: !!taskAddress,
     staleTime: 0, // Always consider data stale to ensure fresh queries
@@ -432,17 +415,6 @@ export function TaskDetail() {
                 </Card>
               )}
 
-              {user?.pubkey === task.patronPubkey && (
-                <Card>
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{task.arbiterPubkey ? 'Change arbiter' : 'Assign an arbiter'}</span>
-                    </div>
-                    <AssignArbiterControl task={task} curatorPubkey={rememberedCurator || undefined} />
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* Crowdfunding Progress */}
@@ -510,12 +482,11 @@ export function TaskDetail() {
           </CardContent>
         </Card>
 
-        {/* Task Management */}
-        <TaskManagement
+        {/* Role-based task management (Grantless) */}
+        <TaskLifecycleActions
           task={task}
-          realZapsEnabled={true}
+          curatorPubkey={rememberedCurator || undefined}
           onUpdate={() => {
-            // Invalidate and refetch the task detail query
             invalidateAllCatallaxQueries();
             queryClient.invalidateQueries({
               queryKey: ['task-detail', taskAddress?.pubkey, taskAddress?.identifier]

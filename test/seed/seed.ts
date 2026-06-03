@@ -1,4 +1,5 @@
 import {
+  anchorClock,
   publish,
   publishArbiter,
   publishCurationList,
@@ -76,6 +77,11 @@ function signerFor(status: Status, spec: ProjectSpec): SeedAccount {
 }
 
 export async function runSeed(relayUrl: string): Promise<SeedSummary> {
+  // Backdate all seeded events ~1h into the past (incrementing) so the lifecycle's
+  // relative order is preserved but any later real-time action (a user advancing a
+  // seeded task) always wins the latest-wins race.
+  anchorClock(Math.floor(Date.now() / 1000) - 3600);
+
   const summary: SeedSummary = {
     profiles: 0,
     curationLists: 0,

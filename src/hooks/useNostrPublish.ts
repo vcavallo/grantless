@@ -7,22 +7,29 @@ import { CATALLAX_KINDS } from "@/lib/catallax";
 import type { NostrEvent } from "@nostrify/nostrify";
 
 /**
- * Publish an event, retrying once on failure. The first write after a cold load can
- * race the relay websocket (still (re)connecting — e.g. right after a relay-config
- * change) so `NPool.event`'s `Promise.any` rejects with "No Promise in Promise.any
- * was resolved". A single retry once the socket is open recovers it. Re-sending the
- * same signed event is idempotent (relays dedupe by event id), so this is safe.
+ * Publish an event, retrying with backoff on failure. A write soon after a cold load
+ * can race the relay websocket (still (re)connecting — e.g. right after a relay-config
+ * change), so `NPool.event`'s `Promise.any` rejects with "No Promise in Promise.any
+ * was resolved" / "All promises were rejected". A few backed-off retries give the
+ * socket time to open. Re-sending the same signed event is idempotent (relays dedupe
+ * by event id), so retrying is safe.
  */
 async function publishWithRetry(
   nostr: { event: (event: NostrEvent, opts?: { signal?: AbortSignal }) => Promise<void> },
   event: NostrEvent,
 ): Promise<void> {
-  try {
-    await nostr.event(event, { signal: AbortSignal.timeout(5000) });
-  } catch {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    await nostr.event(event, { signal: AbortSignal.timeout(5000) });
+  const backoffs = [0, 400, 1200, 2500];
+  let lastError: unknown;
+  for (const delay of backoffs) {
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    try {
+      await nostr.event(event, { signal: AbortSignal.timeout(6000) });
+      return;
+    } catch (error) {
+      lastError = error;
+    }
   }
+  throw lastError;
 }
 
 export function useNostrPublish(): UseMutationResult<NostrEvent> {

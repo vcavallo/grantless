@@ -38,10 +38,29 @@ interface PublishOpts {
 // or the relay keeps the first (same-second publishes collide). Real clients hit
 // this too; the harness models the "each revision is newer" invariant.
 let lastTs = 0;
+// Optional anchor. When set (e.g. by the dev seed), timestamps increment from it
+// instead of tracking wall clock — so seeded events can be deliberately backdated.
+let clockAnchor: number | null = null;
 function nextTs(): number {
+  if (clockAnchor !== null) {
+    lastTs = Math.max(clockAnchor, lastTs + 1);
+    return lastTs;
+  }
   const now = Math.floor(Date.now() / 1000);
   lastTs = Math.max(now, lastTs + 1);
   return lastTs;
+}
+
+/**
+ * Anchor `created_at` to a fixed start (used by the dev seed to backdate events).
+ * Without this, the monotonic clock can drift *ahead* of wall time when many events
+ * publish in the same second — which would make a later real-time action (e.g. a
+ * user advancing a seeded task) lose the latest-wins race. Backdating keeps all
+ * seeded events safely in the past.
+ */
+export function anchorClock(startTs: number): void {
+  clockAnchor = startTs;
+  lastTs = startTs - 1;
 }
 
 export function publish(relay: string, o: PublishOpts): { id: string; event: NostrEvent } {

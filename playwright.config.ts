@@ -21,7 +21,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run relay:up && npm run seed && VITE_RELAY_URL=ws://127.0.0.1:7787 vite --port 8123 --strictPort',
+    command: 'npm run relay:down && npm run relay:up && npm run seed && VITE_RELAY_URL=ws://127.0.0.1:7787 vite --port 8123 --strictPort',
     url: 'http://127.0.0.1:8123',
     reuseExistingServer: true,
     timeout: 120_000,

@@ -354,6 +354,115 @@ export function taskProposalToInput(task: TaskProposal): TaskProposalInput {
   };
 }
 
+/** Re-publish template for a task with a new status (other fields preserved). */
+export function markTaskStatus(
+  task: TaskProposal,
+  status: TaskStatus,
+): { kind: number; content: string; tags: string[][] } {
+  return buildTaskProposalTemplate({ ...taskProposalToInput(task), status });
+}
+
+/** Re-publish template assigning a worker (3rd `p`) and moving to `in_progress`. */
+export function assignWorker(
+  task: TaskProposal,
+  workerPubkey: string,
+): { kind: number; content: string; tags: string[][] } {
+  return buildTaskProposalTemplate({ ...taskProposalToInput(task), workerPubkey, status: 'in_progress' });
+}
+
+export interface TaskConclusionInput {
+  /** `33401:<patron>:<d>` of the task being concluded. */
+  taskCoord: string;
+  /** Event id of the (latest, submitted) task proposal. */
+  taskId: string;
+  /** Event id of the payout/refund zap receipt (mocked here). */
+  payoutReceiptId?: string;
+  patron: string;
+  arbiter: string;
+  worker?: string;
+  resolution: ResolutionType;
+  details?: string;
+}
+
+/**
+ * Build a kind-3402 task-conclusion template. `parseTaskConclusion` reads `e` tags
+ * positionally (payout receipt first, then the task id), so emit them in that order.
+ * Pure.
+ */
+export function buildTaskConclusionTemplate(
+  input: TaskConclusionInput,
+): { kind: number; content: string; tags: string[][] } {
+  const content: TaskConclusionContent = { resolution_details: input.details ?? '' };
+  const tags: string[][] = [];
+  if (input.payoutReceiptId) tags.push(['e', input.payoutReceiptId]);
+  tags.push(['e', input.taskId]);
+  tags.push(['p', input.patron]);
+  tags.push(['p', input.arbiter]);
+  if (input.worker) tags.push(['p', input.worker]);
+  tags.push(['resolution', input.resolution]);
+  tags.push(['a', input.taskCoord]);
+  tags.push(['t', 'catallax']);
+  return { kind: CATALLAX_KINDS.TASK_CONCLUSION, content: JSON.stringify(content), tags };
+}
+
+export interface MockZapReceiptInput {
+  senderPubkey: string;
+  recipient: string;
+  amountSats: number;
+  /** The goal or task event id this (mocked) receipt is associated with. */
+  referencedId: string;
+}
+
+/**
+ * Build a mocked kind-9735 zap receipt — a stand-in for a real LNURL-server receipt
+ * (signed in-app by the payer). Used for payout/refund references until real
+ * Lightning lands. Mirrors the nak harness shape. Pure.
+ */
+export function buildMockZapReceiptTemplate(
+  input: MockZapReceiptInput,
+): { kind: number; content: string; tags: string[][] } {
+  const description = JSON.stringify({
+    pubkey: input.senderPubkey,
+    tags: [['amount', String(input.amountSats * 1000)]],
+  });
+  return {
+    kind: 9735,
+    content: '',
+    tags: [
+      ['e', input.referencedId],
+      ['p', input.recipient],
+      ['description', description],
+    ],
+  };
+}
+
+/**
+ * Select the authoritative (latest, authorized-updater) version of a task from a
+ * set of 33401 events for one `patron:d`. A task is a replaceable event keyed by
+ * its *signer*, so a worker- or arbiter-signed status update lives at a different
+ * coordinate than the patron's — callers must query by `#d` (not `authors`) and
+ * dedupe here. An update counts only if signed by the task's own patron, arbiter,
+ * or worker (authorized-updater rule); newest `created_at` wins. Pure.
+ */
+export function latestAuthoritativeTask(
+  events: NostrEvent[],
+  patronPubkey: string,
+  d: string,
+): TaskProposal | null {
+  let latest: TaskProposal | null = null;
+  for (const event of events) {
+    const task = parseTaskProposal(event);
+    if (!task || task.patronPubkey !== patronPubkey || task.d !== d) continue;
+    const authorized =
+      task.pubkey === task.patronPubkey ||
+      task.pubkey === task.arbiterPubkey ||
+      task.pubkey === task.workerPubkey;
+    if (!authorized) continue;
+    if (!latest || task.created_at > latest.created_at) latest = task;
+  }
+  return latest;
+}
+
 export function generateServiceId(name: string): string {
   const slug = name
     .toLowerCase()

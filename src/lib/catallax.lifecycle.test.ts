@@ -8,6 +8,7 @@ import {
   assignWorker,
   buildTaskConclusionTemplate,
   buildMockZapReceiptTemplate,
+  latestAuthoritativeTask,
   CATALLAX_KINDS,
   type TaskProposal,
 } from './catallax';
@@ -88,6 +89,32 @@ describe('buildTaskConclusionTemplate', () => {
     expect(conc?.taskReference).toBe(`33401:${PATRON}:task-1`);
     expect(conc?.content.resolution_details).toBe('done');
     expect(tmpl.tags.some((t) => t[0] === 't' && t[1] === 'catallax')).toBe(true);
+  });
+});
+
+describe('latestAuthoritativeTask', () => {
+  const D = 'task-1';
+  // Each transition is signed by its acting role (different signer ⇒ different
+  // replaceable coordinate), so resolution must span signers, not filter by author.
+  const proposed = toEvent(
+    buildTaskProposalTemplate({ d: D, patronPubkey: PATRON, title: 'T', description: 'D', requirements: 'R', amount: '1', status: 'proposed', arbiterPubkey: ARBITER, arbiterService: `33400:${ARBITER}:s` }),
+    PATRON,
+  );
+  proposed.created_at = 100;
+  const inProgress = { ...toEvent(buildTaskProposalTemplate({ d: D, patronPubkey: PATRON, title: 'T', description: 'D', requirements: 'R', amount: '1', status: 'in_progress', arbiterPubkey: ARBITER, arbiterService: `33400:${ARBITER}:s`, workerPubkey: WORKER }), PATRON), created_at: 200 };
+  const submittedByWorker = { ...toEvent(buildTaskProposalTemplate({ d: D, patronPubkey: PATRON, title: 'T', description: 'D', requirements: 'R', amount: '1', status: 'submitted', arbiterPubkey: ARBITER, arbiterService: `33400:${ARBITER}:s`, workerPubkey: WORKER }), WORKER), created_at: 300 };
+
+  it('picks the newest version across signers (worker-signed submitted wins)', () => {
+    const latest = latestAuthoritativeTask([proposed, inProgress, submittedByWorker], PATRON, D);
+    expect(latest?.status).toBe('submitted');
+    expect(latest?.pubkey).toBe(WORKER);
+  });
+
+  it('ignores updates from an unauthorized signer (not patron/arbiter/worker)', () => {
+    const STRANGER = 'stranger'.padEnd(64, '0');
+    const hijack = { ...toEvent(buildTaskProposalTemplate({ d: D, patronPubkey: PATRON, title: 'T', description: 'D', requirements: 'R', amount: '1', status: 'concluded', arbiterPubkey: ARBITER, arbiterService: `33400:${ARBITER}:s`, workerPubkey: WORKER }), STRANGER), created_at: 999 };
+    const latest = latestAuthoritativeTask([inProgress, submittedByWorker, hijack], PATRON, D);
+    expect(latest?.status).toBe('submitted'); // the stranger's newer 'concluded' is rejected
   });
 });
 

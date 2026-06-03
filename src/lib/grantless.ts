@@ -86,6 +86,23 @@ export const GRANTLESS_APPLICANTS_SLUG = 'grantless-applicants';
 /** The tag slug whose curated set is the list of arbiters a curator vouches for. */
 export const GRANTLESS_ARBITER_SLUG = 'grantless-arbiter';
 
+/**
+ * Normalize a single pubkey input (an `npub…` or a 64-char hex key) to hex, or
+ * return null if it's neither. Used by the worker-assignment input. Pure.
+ */
+export function parsePubkey(input: string): string | null {
+  const token = input.trim();
+  if (!token) return null;
+  if (/^[0-9a-f]{64}$/i.test(token)) return token.toLowerCase();
+  try {
+    const decoded = nip19.decode(token);
+    if (decoded.type === 'npub') return decoded.data;
+  } catch {
+    // not a valid npub
+  }
+  return null;
+}
+
 export interface CurationList {
   /** The curator / point-of-view this list belongs to. */
   observer: string;
