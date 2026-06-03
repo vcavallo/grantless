@@ -1,6 +1,6 @@
 # Story 5: Create a project
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature
 
@@ -46,4 +46,4 @@ Resolved during planning (decisions for the autonomous run, grounded in the epic
 - Reference: `src/components/catallax/TaskProposalForm.tsx` (existing full form — folds in Stories 6–7), `NIP.md` (33401 schema).
 - ADR: `.pi/engineering-team/decisions/0005-create-project.md`
 - Test plan: `.pi/engineering-team/stories/5-create-project.test-plan.md`
-- Review: `.pi/engineering-team/reviews/5-create-project.md`
+- Review: `.pi/engineering-team/reviews/5-create-project.md` — **PASS**
