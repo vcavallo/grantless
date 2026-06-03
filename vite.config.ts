@@ -20,9 +20,10 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    // The Docker/strfry + nak e2e suite runs under vitest.e2e.config.ts
-    // (`npm run test:e2e`), never in the fast unit gate.
-    exclude: [...configDefaults.exclude, 'test/e2e/**'],
+    // The Docker/strfry + nak e2e suites run under vitest.e2e.config.ts
+    // (`npm run test:e2e`), never in the fast unit gate. Match every *.e2e.test.ts
+    // wherever it lives (test/e2e, test/seed, …); plain *.test.ts stay in the gate.
+    exclude: [...configDefaults.exclude, 'test/**/*.e2e.test.ts'],
     onConsoleLog(log) {
       return !log.includes("React Router Future Flag Warning");
     },
