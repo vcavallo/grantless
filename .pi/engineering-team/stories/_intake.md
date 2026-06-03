@@ -82,3 +82,14 @@ who'd used the app before. The seed→browse flow was silently broken for return
 Architecture). Fix: `RelayEnvOverride` makes `VITE_RELAY_URL` authoritative on load when
 set (overrides persisted relay → custom/customRelay), no-op when unset. Belongs to Story 3's
 `VITE_RELAY_URL` feature. Gates clean; manual-verify (UI, per the feature's nature).
+
+## 2026-06-03 — Fix: CSP blocked ws:// to the local relay (the real blocker)
+**Raw:** Local browse showed no data even on the dev machine; console: CSP blocked
+ws://127.0.0.1:7787 (connect-src 'self' blob: https: wss:). The static CSP <meta> in
+index.html allows secure wss: but not plaintext ws:, so the browser blocked ALL
+connections to the local strfry — the actual reason Stories 2–4's local browse never
+showed data in-browser. (Supersedes the earlier localStorage/Tailscale theories.)
+**Classified:** Bug (obvious) — Implementer + Reviewer. Fix: a dev-server-only Vite
+plugin (apply:'serve') adds `ws:` to connect-src via transformIndexHtml; the production
+build's CSP stays strict (wss: only). Verified: dev index has ws:, dist/index.html does
+not. Belongs to Story 3's local-relay dev infra. Gates clean.

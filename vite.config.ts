@@ -2,6 +2,25 @@ import path from "node:path";
 
 import react from "@vitejs/plugin-react-swc";
 import { configDefaults, defineConfig } from "vitest/config";
+import type { Plugin } from "vite";
+
+// Dev-server-only CSP relaxation: the production CSP in index.html allows only
+// secure `wss:` relays (correct for a deployed app). The local strfry used for
+// dev/seed speaks plaintext `ws:`, which that policy blocks. This plugin adds
+// `ws:` to `connect-src` ONLY when serving the dev server (`apply: 'serve'`), so
+// the production build's CSP is left strict and untouched.
+function devAllowWsRelay(): Plugin {
+  return {
+    name: "dev-allow-ws-relay",
+    apply: "serve",
+    transformIndexHtml(html: string) {
+      return html.replace(
+        "connect-src 'self' blob: https: wss:",
+        "connect-src 'self' blob: https: wss: ws:",
+      );
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
@@ -15,6 +34,7 @@ export default defineConfig(() => ({
   },
   plugins: [
     react(),
+    devAllowWsRelay(),
   ],
   test: {
     globals: true,
