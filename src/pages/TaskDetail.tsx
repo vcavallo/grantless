@@ -12,6 +12,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Copy, ExternalLink, ArrowLeft, Calendar, Bitcoin, User, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { AssignArbiterControl } from '@/components/grantless/AssignArbiterControl';
 import { TaskManagement } from '@/components/catallax/TaskManagement';
 import { CATALLAX_KINDS, parseTaskProposal, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
 import { useCatallaxInvalidation } from '@/hooks/useCatallax';
@@ -29,6 +32,9 @@ export function TaskDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { invalidateAllCatallaxQueries } = useCatallaxInvalidation();
+  const { user } = useCurrentUser();
+  // Curator context for the arbiter options on this (non-curator-scoped) page.
+  const [rememberedCurator] = useLocalStorage<string>('grantless:lastCurator', '');
   const [waitingForPayment, setWaitingForPayment] = useState(false);
 
   // Decode the naddr to get task details
@@ -422,6 +428,18 @@ export function TaskDetail() {
                       </p>
                       <CopyNpubButton pubkey={task.workerPubkey} size="sm" className="h-6 w-6 p-0" />
                     </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {user?.pubkey === task.patronPubkey && (
+                <Card>
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">{task.arbiterPubkey ? 'Change arbiter' : 'Assign an arbiter'}</span>
+                    </div>
+                    <AssignArbiterControl task={task} curatorPubkey={rememberedCurator || undefined} />
                   </CardContent>
                 </Card>
               )}

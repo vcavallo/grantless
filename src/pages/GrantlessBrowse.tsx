@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { CuratorBrowser } from '@/components/grantless/CuratorBrowser';
 import { CreateProjectDialog } from '@/components/grantless/CreateProjectDialog';
+import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 
 export default function GrantlessBrowse() {
@@ -25,6 +26,7 @@ export default function GrantlessBrowse() {
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/catallax">Catallax dashboard</Link>
                 </Button>
+                <LoginArea className="max-w-60" />
               </div>
             </div>
             <p className="text-xl text-muted-foreground">The Invisible Handout.</p>
