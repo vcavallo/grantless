@@ -156,3 +156,11 @@ Story 7), per the 2.5 precedent.
 "mark funded" (patron/arbiter); conclusion uses a mocked payout/refund receipt; worker assigned
 by patron (self-assign allowed); cancel = arbiter 3402 cancelled/abandoned.
 **Status:** → `stories/6.5-task-management-detail-page.md` (Approved). Running all phases.
+
+## 2026-06-03 — Tweak: CRUD actions only on the detail page
+**Raw:** Remove the "change arbiter" UI from the index; all CRUD actions should only be on the
+detail page.
+**Classified:** Small UI change (Implementer + Reviewer). Removed AssignArbiterControl from the
+browse card (NomineeProjectItem); kept the read-only "Arbiter: …" display; dropped the now-unused
+curatorPubkey prop threading (NomineeCard/NomineeGrid/CuratorBrowser). Flipped the Playwright
+browse-card spec to guard that the index offers no management control. Gates + Playwright clean.

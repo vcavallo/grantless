@@ -4,12 +4,14 @@ import { loginAs, rememberCurator, selectCurator, ALICE } from './helpers';
 
 const CATALLAX_TASK_KIND = 33401;
 
-test('the patron can assign an arbiter from the browse card', async ({ page }) => {
+test('the browse card shows the arbiter read-only, with no management control', async ({ page }) => {
   await loginAs(page, ALICE);
   await page.goto('/');
   await selectCurator(page);
-  // Alice's own project cards offer the arbiter assign/change control.
-  await expect(page.getByRole('button', { name: /^(assign|change)$/i }).first()).toBeVisible({ timeout: 15_000 });
+  // Alice's seeded projects render (with the arbiter surfaced)…
+  await expect(page.getByText(/Arbiter:/i).first()).toBeVisible({ timeout: 15_000 });
+  // …but management actions live only on the detail page, not the index.
+  await expect(page.getByRole('button', { name: /^(assign|change|mark funded|mark submitted|conclude)$/i })).toHaveCount(0);
 });
 
 test('the patron can manage the arbiter from the task detail page', async ({ page }) => {

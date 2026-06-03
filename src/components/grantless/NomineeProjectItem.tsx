@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { genUserName } from '@/lib/genUserName';
 import { Badge } from '@/components/ui/badge';
 import { CATALLAX_KINDS, getStatusColor, type TaskProposal } from '@/lib/catallax';
-import { AssignArbiterControl } from './AssignArbiterControl';
 
 /** Shows the assigned arbiter, surfacing the proposer-is-arbiter relationship. */
 function ArbiterLine({ arbiterPubkey, isProposer }: { arbiterPubkey: string; isProposer: boolean }) {
@@ -20,14 +18,10 @@ function ArbiterLine({ arbiterPubkey, isProposer }: { arbiterPubkey: string; isP
 }
 
 /**
- * A nominee's task-proposal row: title + status (linking to the task detail), the
- * assigned arbiter (surfaced, incl. proposer==arbiter), and — for the project's own
- * patron — a control to assign/change the curator-vouched arbiter.
+ * A nominee's task-proposal row: title + status (linking to the task detail) and the
+ * assigned arbiter (read-only). All management actions live on the detail page.
  */
-export function NomineeProjectItem({ task, curatorPubkey }: { task: TaskProposal; curatorPubkey?: string }) {
-  const { user } = useCurrentUser();
-  const isPatron = user?.pubkey === task.patronPubkey;
-
+export function NomineeProjectItem({ task }: { task: TaskProposal }) {
   const naddr = nip19.naddrEncode({
     kind: CATALLAX_KINDS.TASK_PROPOSAL,
     pubkey: task.patronPubkey,
@@ -49,8 +43,6 @@ export function NomineeProjectItem({ task, curatorPubkey }: { task: TaskProposal
       {task.arbiterPubkey && (
         <ArbiterLine arbiterPubkey={task.arbiterPubkey} isProposer={task.arbiterPubkey === task.patronPubkey} />
       )}
-
-      {isPatron && <AssignArbiterControl task={task} curatorPubkey={curatorPubkey} />}
     </div>
   );
 }

@@ -10,15 +10,13 @@ interface NomineeCardProps {
   tasks: TaskProposal[];
   /** Profile metadata (batch-fetched by the browser); falls back when absent. */
   metadata?: NostrMetadata;
-  /** Selected curator — supplies the arbiter options for the patron's assign control. */
-  curatorPubkey?: string;
 }
 
 /**
  * A single nominee: profile (name + avatar, with fallback) and their Catallax
  * projects beneath — or "No projects yet" when they've posted none.
  */
-export function NomineeCard({ pubkey, tasks, metadata, curatorPubkey }: NomineeCardProps) {
+export function NomineeCard({ pubkey, tasks, metadata }: NomineeCardProps) {
   const displayName = metadata?.name ?? genUserName(pubkey);
   const image = metadata?.picture;
   const initial = displayName.slice(0, 2).toUpperCase();
@@ -45,7 +43,7 @@ export function NomineeCard({ pubkey, tasks, metadata, curatorPubkey }: NomineeC
         ) : (
           <div className="space-y-2">
             {tasks.map((task) => (
-              <NomineeProjectItem key={task.id} task={task} curatorPubkey={curatorPubkey} />
+              <NomineeProjectItem key={task.id} task={task} />
             ))}
           </div>
         )}
