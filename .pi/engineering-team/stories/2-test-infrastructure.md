@@ -36,5 +36,5 @@ The local relay is a **dev/test-only** resource, never a prod default or privile
 ## Linked artifacts
 - Epic: `.pi/engineering-team/epics/grantless-mvp.md`
 - ADR: `.pi/engineering-team/decisions/0002-test-infrastructure.md`
-- Test plan: (filled in after Test Design phase)
+- Test plan: `.pi/engineering-team/stories/2-test-infrastructure.test-plan.md`
 - Review: `.pi/engineering-team/reviews/2-test-infrastructure.md` — **PASS**
