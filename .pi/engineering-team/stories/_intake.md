@@ -164,3 +164,10 @@ detail page.
 browse card (NomineeProjectItem); kept the read-only "Arbiter: …" display; dropped the now-unused
 curatorPubkey prop threading (NomineeCard/NomineeGrid/CuratorBrowser). Flipped the Playwright
 browse-card spec to guard that the index offers no management control. Gates + Playwright clean.
+
+## 2026-06-03 — Tweak: arbiter picker shows identity, not the (shared) service title
+**Raw:** Arbiter dropdown options all said "Test Arbiter" while the task's Arbiter slot showed
+Dave/Erin. Cause: the picker labeled options by the kind-33400 service title (seed gives every
+arbiter the title "Test Arbiter"), whereas the slot uses the kind-0 profile name. Fix: label
+options by profile identity (useAuthor, like the slot), with the service title as muted secondary.
+Implementer + Reviewer; gates + Playwright clean.

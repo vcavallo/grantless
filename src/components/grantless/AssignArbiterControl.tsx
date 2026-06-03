@@ -4,6 +4,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useCuratorArbiterCandidates } from '@/hooks/useCuratorArbiterCandidates';
+import { useAuthor } from '@/hooks/useAuthor';
 import { buildTaskProposalTemplate, taskProposalToInput, type TaskProposal } from '@/lib/catallax';
 import { genUserName } from '@/lib/genUserName';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+/**
+ * Label an arbiter option by *identity* (their kind-0 profile name, as the task's
+ * Arbiter slot does), with the service-announcement title as secondary context —
+ * so options are distinguishable even when several services share a title.
+ */
+function CandidateLabel({ pubkey, serviceName }: { pubkey: string; serviceName?: string }) {
+  const author = useAuthor(pubkey);
+  const name = author.data?.metadata?.name ?? genUserName(pubkey);
+  return (
+    <span>
+      {name}
+      {serviceName && serviceName !== name && (
+        <span className="ml-2 text-muted-foreground">· {serviceName}</span>
+      )}
+    </span>
+  );
+}
 
 interface AssignArbiterControlProps {
   task: TaskProposal;
@@ -78,7 +97,7 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
         <SelectContent>
           {candidates.map((c) => (
             <SelectItem key={c.pubkey} value={c.pubkey}>
-              {c.name ?? genUserName(c.pubkey)}
+              <CandidateLabel pubkey={c.pubkey} serviceName={c.name} />
             </SelectItem>
           ))}
         </SelectContent>
