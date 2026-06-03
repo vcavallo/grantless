@@ -107,3 +107,16 @@ A full TaskProposalForm exists on /catallax but requires an arbiter + creates th
 (Story 7); funding_type fixed to crowdfunding; form reachable from the Grantless browse when
 logged in (Architect picks dialog vs route + reuse vs fresh).
 **Status:** → `stories/5-create-project.md` (Approved).
+
+## 2026-06-03 — Assign an arbiter (curator-vouched) [epic "Assent to arbitrate"]
+**Raw:** Continue the epic — Story 6. Run all phases autonomously; user checks in after review.
+**Classified:** Feature. Standard strictness → full phase path. The patron assigns an arbiter to
+their proposed 33401, chosen from the currently-selected curator's grantless-arbiter list (kind
+30392 observer/source-tag, slug grantless-arbiter — reuses Story 4's slug-parameterized resolver);
+re-publishes the task (patron-signed) with the arbiter p[1] + a tags via Story 5's builder; status
+stays proposed. Arbiter is surfaced in the UI.
+**KEY PROTOCOL FINDING:** Catallax has NO arbiter-assent event (NIP.md:22 — out-of-band
+coordination, then patron updates the task). Decision: surface the designation, do NOT introduce
+an assent kind (would deviate from NIP / break interop). Flagged for review veto; an explicit
+in-app assent would be a separate story + NIP change.
+**Status:** → `stories/6-assent-to-arbitrate.md` (Approved).
