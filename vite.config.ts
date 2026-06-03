@@ -43,7 +43,9 @@ export default defineConfig(() => ({
     // The Docker/strfry + nak e2e suites run under vitest.e2e.config.ts
     // (`npm run test:e2e`), never in the fast unit gate. Match every *.e2e.test.ts
     // wherever it lives (test/e2e, test/seed, …); plain *.test.ts stay in the gate.
-    exclude: [...configDefaults.exclude, 'test/**/*.e2e.test.ts'],
+    // Keep the Docker/nak e2e suites and the Playwright browser specs out of the
+    // fast unit gate; they run under `npm run test:e2e` / `npm run test:browser`.
+    exclude: [...configDefaults.exclude, 'test/**/*.e2e.test.ts', 'test/browser/**'],
     onConsoleLog(log) {
       return !log.includes("React Router Future Flag Warning");
     },
