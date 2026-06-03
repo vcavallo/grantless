@@ -1,6 +1,6 @@
 # Story 7: Contribute to a crowdfund
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature
 
@@ -45,4 +45,5 @@ Resolved during planning (decisions for the autonomous run, grounded in the epic
 - Builds on: Story 5 (`buildTaskProposalTemplate`/`taskProposalToInput`), Story 6 (arbiter), Story 6.5 (`buildMockZapReceiptTemplate`, `markTaskStatus`, `TaskLifecycleActions`, `latestAuthoritativeTask`), Story 3 seed (funded+ tasks already carry 9041 goals + mocked receipts).
 - Reuse: `calculateGoalProgress`, `parseZapReceiptAmount/Sender`, `buildGoalEventTags`, `GoalProgress`/`GoalContributor`, `useZapGoal` (`src/lib/catallax.ts`, `src/hooks/useZapGoal.ts`); the existing `GoalProgressBar`/`ContributorsList` may inform the UI.
 - ADR: `.pi/engineering-team/decisions/0009-contribute-to-crowdfund.md`
-- Test plan / Review: filled in later phases.
+- Test plan: `.pi/engineering-team/stories/7-contribute-to-crowdfund.test-plan.md`
+- Review: `.pi/engineering-team/reviews/7-contribute-to-crowdfund.md` — **PASS**
