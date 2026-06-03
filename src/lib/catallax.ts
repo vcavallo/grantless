@@ -258,6 +258,76 @@ export function generateTaskId(title: string): string {
   return `${slug}-${timestamp}`;
 }
 
+/** Input for building a kind-33401 task proposal. `d` is supplied by the caller
+ *  (e.g. via `generateTaskId`) so the builder stays pure/deterministic. */
+export interface TaskProposalInput {
+  d: string;
+  patronPubkey: string;
+  title: string;
+  description: string;
+  requirements: string;
+  /** Funding target / amount, in sats, as a string (the 33401 `amount` tag). */
+  amount: string;
+  status?: TaskStatus;
+  fundingType?: FundingType;
+  /** Arbiter pubkey (the escrow holder). Optional — set when an arbiter is chosen. */
+  arbiterPubkey?: string;
+  /** Arbiter service coordinate `33400:<arbiterPubkey>:<d>`. */
+  arbiterService?: string;
+  /** Worker pubkey. Only emitted alongside an arbiter (positional p-tag semantics). */
+  workerPubkey?: string;
+  /** NIP-75 zap-goal event id (set once funding is configured). */
+  goalId?: string;
+  detailsUrl?: string;
+  categories?: string[];
+  /** Deadline as a unix timestamp (seconds). */
+  deadline?: number;
+}
+
+/**
+ * Build a kind-33401 task-proposal event template (`{ kind, content, tags }`) ready
+ * to sign/publish. Pure and deterministic. `parseTaskProposal` reads `p` tags
+ * positionally (patron, arbiter, worker), so the patron is always the first `p`,
+ * and a worker is only emitted when an arbiter is present — preserving that order.
+ * Arbiter/`a`/`goal` are omitted unless provided, so a Grantless `proposed` task is
+ * arbiter-less and goal-less by simply not passing them.
+ */
+export function buildTaskProposalTemplate(
+  input: TaskProposalInput,
+): { kind: number; content: string; tags: string[][] } {
+  const content: TaskProposalContent = {
+    title: input.title,
+    description: input.description,
+    requirements: input.requirements,
+  };
+  if (input.deadline !== undefined) {
+    content.deadline = input.deadline;
+  }
+
+  const tags: string[][] = [
+    ['d', input.d],
+    ['p', input.patronPubkey],
+  ];
+  if (input.arbiterPubkey) {
+    tags.push(['p', input.arbiterPubkey]);
+    if (input.workerPubkey) {
+      tags.push(['p', input.workerPubkey]);
+    }
+  }
+  if (input.arbiterService) tags.push(['a', input.arbiterService]);
+  tags.push(['amount', input.amount]);
+  tags.push(['t', 'catallax']);
+  tags.push(['status', input.status ?? 'proposed']);
+  tags.push(['funding_type', input.fundingType ?? 'single']);
+  if (input.detailsUrl) tags.push(['r', input.detailsUrl]);
+  if (input.goalId) tags.push(['goal', input.goalId]);
+  for (const category of input.categories ?? []) {
+    tags.push(['t', category]);
+  }
+
+  return { kind: CATALLAX_KINDS.TASK_PROPOSAL, content: JSON.stringify(content), tags };
+}
+
 export function generateServiceId(name: string): string {
   const slug = name
     .toLowerCase()
