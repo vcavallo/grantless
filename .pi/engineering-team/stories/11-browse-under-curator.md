@@ -1,6 +1,6 @@
 # Story 11: Browse under a Curator — filters, sorts, funding cards, shareable URL
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature
 
@@ -42,4 +42,5 @@ Resolved during planning (with the user):
 - Epic: `.pi/engineering-team/epics/grantless-mvp.md` (Story 11 row — filters / date sorts / shareable URLs)
 - Builds on: Story 4 (`CuratorBrowser`, curator resolver), Story 7 (`calculateGoalProgress`, goals + mocked receipts), Story 1 (`NomineeCard`/`NomineeProjectItem`/`NomineeGrid`), `parsePubkey` (Story 6.5) for the npub route param.
 - ADR: `.pi/engineering-team/decisions/0010-browse-under-curator.md`
-- Test plan / Review: filled in later phases.
+- Test plan: `.pi/engineering-team/stories/11-browse-under-curator.test-plan.md`
+- Review: `.pi/engineering-team/reviews/11-browse-under-curator.md` — **PASS**
