@@ -120,3 +120,16 @@ coordination, then patron updates the task). Decision: surface the designation, 
 an assent kind (would deviate from NIP / break interop). Flagged for review veto; an explicit
 in-app assent would be a separate story + NIP change.
 **Status:** → `stories/6-assent-to-arbitrate.md` (Approved).
+
+## 2026-06-03 — Browser e2e (Playwright) + UX hardening [Story 2.5]
+**Raw:** During Story 6 manual testing the user hit: no visible login button (only via Post-a-
+project), arbiter control only on the browse index (not the task detail page), and a recurring
+"No curators found" regression in a returning logged-in session (incognito works). User: "perhaps
+it's time to finally add the Playwright tests so this kind of thing would have been caught."
+**Classified:** Feature (test infra + UX/bug fixes). Standard → full phase path. User chose "Full
+Story 2.5 now" (Playwright harness + reproduce/fix the persisted-session regression + persistent
+login button + arbiter-on-detail). Lands before Story 7.
+**Decisions:** Playwright headless vs seeded local relay; regression root-caused via Playwright in
+the Architecture phase (not yet pinned by inspection); arbiter detail-page curator-context is an
+Architect decision; login affordance in the browse header.
+**Status:** → `stories/2.5-browser-e2e-ux-hardening.md` (Approved).
