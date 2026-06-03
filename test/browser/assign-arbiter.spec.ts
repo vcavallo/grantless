@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { nip19 } from 'nostr-tools';
-import { loginAs, rememberCurator, selectCurator, ALICE } from './helpers';
+import { loginAs, rememberCurator, selectCurator, ALICE, QUINN } from './helpers';
 
 const CATALLAX_TASK_KIND = 33401;
 
@@ -25,4 +25,15 @@ test('the patron can manage the arbiter from the task detail page', async ({ pag
   await page.goto(`/task/${naddr}`);
   // The assign/change-arbiter control must be present on the detail page for the patron.
   await expect(page.getByRole('button', { name: /^(assign|change)$/i }).first()).toBeVisible({ timeout: 15_000 });
+});
+
+test('the arbiter options follow the selected curator', async ({ page }) => {
+  await loginAs(page, ALICE);
+  // Browse under Quinn, who vouches for arbiter Erin only (Cleo vouches for Dave + Erin).
+  await rememberCurator(page, QUINN.pub);
+  const naddr = nip19.naddrEncode({ kind: CATALLAX_TASK_KIND, pubkey: ALICE.pub, identifier: 'seed-proposed-alice' });
+  await page.goto(`/task/${naddr}`);
+  await page.getByRole('combobox').first().click(); // open the arbiter selector
+  await expect(page.getByRole('option', { name: /Erin/i })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('option', { name: /Dave/i })).toHaveCount(0); // not in Quinn's arbiter set
 });

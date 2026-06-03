@@ -23,6 +23,7 @@ describe('dev seed (real events on local strfry)', () => {
   const allPubs = [
     ROSTER.ta,
     ROSTER.curator,
+    ROSTER.curator2,
     ...ROSTER.applicants,
     ROSTER.worker,
     ...ROSTER.arbiters,
@@ -51,6 +52,23 @@ describe('dev seed (real events on local strfry)', () => {
       slug: 'grantless-arbiter',
     });
     expect(members).toEqual(ROSTER.arbiters.map((a) => a.pub));
+  });
+
+  it('a second curator has a different applicant and arbiter set', async () => {
+    const applicants = await resolveCuration(RELAY_URL, {
+      curator: ROSTER.curator2.pub,
+      slug: 'grantless-applicants',
+    });
+    const arbiters = await resolveCuration(RELAY_URL, {
+      curator: ROSTER.curator2.pub,
+      slug: 'grantless-arbiter',
+    });
+    // Quinn vouches for fewer applicants and a different arbiter than Cleo —
+    // proving that switching curators changes both sets.
+    expect(applicants).toEqual([ROSTER.applicants[1].pub]); // Bob only
+    expect(arbiters).toEqual([ROSTER.arbiters[1].pub]); // Erin only
+    expect(applicants).not.toEqual(ROSTER.applicants.map((a) => a.pub));
+    expect(arbiters).not.toEqual(ROSTER.arbiters.map((a) => a.pub));
   });
 
   it('publishes an arbiter announcement for each arbiter', async () => {

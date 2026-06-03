@@ -33,6 +33,8 @@ export interface Roster {
   ta: SeedAccount;
   /** The curator whose lists drive discovery. */
   curator: SeedAccount;
+  /** A second curator with a different world (to show curator-switching). */
+  curator2: SeedAccount;
   /** Grant applicants / patrons who post projects. */
   applicants: [SeedAccount, SeedAccount];
   /** A worker distinct from the applicants (for non-self-assigned projects). */
@@ -57,6 +59,13 @@ export const ROSTER: Roster = {
     pub: '355a400ae8952eabd70b61917904541d20f0cb3e3e130f220f7564c20eba22ef',
     npub: 'npub1x4dyqzhgj5h2h4ctvxghjpz5r5s0pje78cfs7gs0w4jvyr46ythsyp69rp',
     nsec: 'nsec1y06nzlrlpkz6z9mptxag0c84kyxac8sse4kh9wh0hr8uvda52rxstmgwsg',
+  },
+  curator2: {
+    name: 'Quinn the Curator',
+    sec: 'e416f09bfd8aaaac0c1339b05a177931ede09e1f1a1ba86eee492d969ac16808',
+    pub: '0dcceae9d01e030ea363fb89cfe45e241934e4857ba7eaa30d8d62855c259c7a',
+    npub: 'npub1phxw46wsrcpsagmrlwyulez7ysvnfey90wn74gcd343g2hp9n3aqhg6fps',
+    nsec: 'nsec1ust0pxla3242crqn8xc959mex8k7p8slrgd6smhwfykedxkpdqyq8v88au',
   },
   applicants: [
     {
@@ -127,6 +136,7 @@ export function allSeedAccounts(): SeedAccount[] {
   return [
     ROSTER.ta,
     ROSTER.curator,
+    ROSTER.curator2,
     ...ROSTER.applicants,
     ROSTER.worker,
     ...ROSTER.arbiters,
@@ -139,6 +149,7 @@ export function formatRoster(): string {
   const rows: Array<[string, SeedAccount]> = [
     ['list-agent', ROSTER.ta],
     ['curator', ROSTER.curator],
+    ['curator-2', ROSTER.curator2],
     ['applicant-1', ROSTER.applicants[0]],
     ['applicant-2', ROSTER.applicants[1]],
     ['worker', ROSTER.worker],

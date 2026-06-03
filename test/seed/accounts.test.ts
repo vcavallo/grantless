@@ -19,6 +19,7 @@ function allAccounts(): SeedAccount[] {
   return [
     ROSTER.ta,
     ROSTER.curator,
+    ROSTER.curator2,
     ...ROSTER.applicants,
     ROSTER.worker,
     ...ROSTER.arbiters,
@@ -31,8 +32,8 @@ describe('dev seed roster (fixed accounts)', () => {
     expect(ROSTER.applicants).toHaveLength(2);
     expect(ROSTER.arbiters).toHaveLength(2);
     expect(ROSTER.funders).toHaveLength(3);
-    // 1 curator + 2 applicants + 1 worker + 2 arbiters + 3 funders + 1 list agent
-    expect(allAccounts()).toHaveLength(10);
+    // 2 curators + 2 applicants + 1 worker + 2 arbiters + 3 funders + 1 list agent
+    expect(allAccounts()).toHaveLength(11);
   });
 
   it('every account is a self-consistent keypair', () => {

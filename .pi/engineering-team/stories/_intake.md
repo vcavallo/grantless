@@ -171,3 +171,13 @@ Dave/Erin. Cause: the picker labeled options by the kind-33400 service title (se
 arbiter the title "Test Arbiter"), whereas the slot uses the kind-0 profile name. Fix: label
 options by profile identity (useAuthor, like the slot), with the service title as muted secondary.
 Implementer + Reviewer; gates + Playwright clean.
+
+## 2026-06-03 — Seed: add a second curator (validate curator-switching)
+**Raw:** Add another curator to the seed to validate that changing the curator changes the
+arbiter set (and applicant set). Confirmed: the selected/remembered curator's grantless-arbiter
+list filters the arbiter options.
+**Classified:** Seed enhancement + validation tests (Implementer + Reviewer). Added curator2
+(Quinn) to the fixed roster with a deliberately different world — applicants [Bob], arbiters
+[Erin] — vs Cleo's [Alice,Bob]/[Dave,Erin]. seed.e2e asserts the second curator's sets differ;
+a new Playwright test asserts the detail-page arbiter options follow the remembered curator
+(under Quinn: Erin present, Dave absent). Gates + e2e (30) + Playwright (13) clean.

@@ -125,7 +125,21 @@ export async function runSeed(relayUrl: string): Promise<SeedSummary> {
     slug: 'grantless-arbiter',
     members: ROSTER.arbiters.map((a) => a.pub),
   });
-  summary.curationLists += 2;
+  // A second curator with a deliberately different world — fewer applicants and a
+  // different arbiter set — so switching curators visibly changes both.
+  publishCurationList(relayUrl, {
+    taSec: ROSTER.ta.sec,
+    observer: ROSTER.curator2.pub,
+    slug: 'grantless-applicants',
+    members: [ROSTER.applicants[1].pub], // Bob only (not Alice)
+  });
+  publishCurationList(relayUrl, {
+    taSec: ROSTER.ta.sec,
+    observer: ROSTER.curator2.pub,
+    slug: 'grantless-arbiter',
+    members: [ROSTER.arbiters[1].pub], // Erin only (not Dave)
+  });
+  summary.curationLists += 4;
 
   // 4. Projects across every status.
   for (const spec of projectSpecs()) {
