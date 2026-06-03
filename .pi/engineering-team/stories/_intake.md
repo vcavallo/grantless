@@ -191,3 +191,12 @@ calculateGoalProgress / buildGoalEventTags / buildMockZapReceiptTemplate / useZa
 **Decisions:** goal created on patron "open for funding" (needs arbiter), not at task creation;
 anyone may contribute; payments mocked; reaching the goal is surfaced, mark-funded stays manual.
 **Status:** → `stories/7-contribute-to-crowdfund.md` (Approved). Running all phases.
+
+## 2026-06-03 — Browse under a Curator [Story 11]
+**Raw:** Index cards should show funding progress for funding-state tasks; add filters + sorts
+(incl. funding-progress sort), hide-concluded toggle, and more. User chose extras: seeking-
+funding, needs-a-worker, hide-empty-applicants (no text search); and include curator-in-URL now.
+**Classified:** Feature (epic Story 11). Standard → full phase path. Baseline: funding progress
+bar on cards, hide-concluded (default on), status filter, sorts (newest/funding/largest goal).
+Extras as chosen. Shareable /c/:npub curator URL. Per-project funding fetched in one batch.
+**Status:** → `stories/11-browse-under-curator.md` (Approved). Running all phases.
