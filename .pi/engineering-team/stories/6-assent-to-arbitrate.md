@@ -1,6 +1,6 @@
 # Story 6: Assign an arbiter (curator-vouched)
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-03
 **Type:** Feature
 
@@ -47,4 +47,4 @@ Resolved during planning (decisions for the autonomous run; flagged for review v
 - Protocol: `NIP.md` (33400 schema; 33401 arbiter tags; out-of-band assent at line 22), `src/lib/catallax.ts`.
 - ADR: `.pi/engineering-team/decisions/0006-assent-to-arbitrate.md`
 - Test plan: `.pi/engineering-team/stories/6-assent-to-arbitrate.test-plan.md`
-- Review: `.pi/engineering-team/reviews/6-assent-to-arbitrate.md`
+- Review: `.pi/engineering-team/reviews/6-assent-to-arbitrate.md` — **PASS**
