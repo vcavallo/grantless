@@ -47,6 +47,17 @@ interface ProjectSpec {
   worker?: SeedAccount;
   target: Status;
   amount: string;
+  /**
+   * Publish the 9041 goal while still `proposed` (Story 7's "open for funding"),
+   * rather than waiting for the `funded` status. Used to seed an in-between,
+   * still-seeking-funding project so the progress bar shows a partial state.
+   */
+  openForFunding?: boolean;
+  /**
+   * Fraction of `amount` that gets mocked-funded (default 1 = goal met/over).
+   * Set below 1 to leave the progress bar partway.
+   */
+  fundedRatio?: number;
 }
 
 /**
@@ -62,6 +73,7 @@ function projectSpecs(): ProjectSpec[] {
   const carol = ROSTER.worker;
   return [
     { d: 'seed-proposed-alice', title: 'Reproducible builds for the wallet', patron: alice, arbiter: dave, target: 'proposed', amount: '50000' },
+    { d: 'seed-seeking-alice', title: 'Lightning paywall plugin for blogs', patron: alice, arbiter: erin, target: 'proposed', amount: '90000', openForFunding: true, fundedRatio: 0.4 },
     { d: 'seed-funded-bob', title: 'Accessibility pass on the onboarding flow', patron: bob, arbiter: erin, target: 'funded', amount: '80000' },
     { d: 'seed-inprogress-alice', title: 'Offline-first sync for notes', patron: alice, arbiter: erin, worker: carol, target: 'in_progress', amount: '120000' },
     { d: 'seed-submitted-bob-self', title: 'Self-hosted relay quickstart guide', patron: bob, arbiter: dave, worker: bob, target: 'submitted', amount: '60000' },
@@ -174,11 +186,15 @@ async function seedProject(
     description: `${spec.title} — a seeded Grantless project.`,
   });
 
+  // The goal is published when the patron "opens for funding": either while still
+  // `proposed` (openForFunding) or, by default, at the moment it becomes `funded`.
+  const goalStatus: Status = spec.openForFunding ? 'proposed' : 'funded';
+
   for (let i = 0; i <= targetIndex; i++) {
     const status = STATUS_ORDER[i] as Status;
 
-    // Funding artifacts appear at the moment the project becomes funded.
-    if (status === 'funded' && !goalId) {
+    // Funding artifacts appear at the moment the project opens for funding.
+    if (status === goalStatus && !goalId) {
       const goal = publishGoal(relayUrl, {
         sec: spec.patron.sec,
         taskCoord,
@@ -187,8 +203,10 @@ async function seedProject(
       });
       goalId = goal.id;
       summary.goals++;
-      // Each funder contributes a (mocked) zap toward the goal, custodied by the arbiter.
-      const share = String(Math.ceil(parseInt(spec.amount, 10) / ROSTER.funders.length));
+      // Each funder contributes a (mocked) zap toward the goal, custodied by the
+      // arbiter. fundedRatio < 1 leaves the goal partway (still seeking funding).
+      const raise = Math.round(parseInt(spec.amount, 10) * (spec.fundedRatio ?? 1));
+      const share = String(Math.ceil(raise / ROSTER.funders.length));
       for (const funder of ROSTER.funders) {
         mockZapReceipt(relayUrl, { sec: funder.sec, goalId, amount: share, recipient: spec.arbiter.pub });
         summary.receipts++;

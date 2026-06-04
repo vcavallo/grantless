@@ -3,7 +3,7 @@ import { relayUp, relayDown, RELAY_URL } from '../e2e/relay';
 import { query, resolveCuration, latestTask } from '../e2e/harness';
 import { runSeed, type SeedSummary } from './seed';
 import { ROSTER } from './accounts';
-import { CATALLAX_KINDS } from '@/lib/catallax';
+import { CATALLAX_KINDS, calculateGoalProgress } from '@/lib/catallax';
 
 // Real-event e2e: run the dev seed against a fresh local strfry and assert the
 // browsable world it lays down. Authored/queried with nak; no mocks except the
@@ -116,6 +116,22 @@ describe('dev seed (real events on local strfry)', () => {
     expect(goals.length).toBeGreaterThanOrEqual(1);
     // At least one receipt per funder for the crowdfund.
     expect(receipts.length).toBeGreaterThanOrEqual(ROSTER.funders.length);
+  });
+
+  it('seeds an in-between project: a goal with real funding that has not been met', async () => {
+    const goals = await query(RELAY_URL, { kinds: [9041] });
+    const progresses = goals.map((goal) => {
+      const receipts = query(RELAY_URL, { kinds: [9735], '#e': [goal.id] });
+      return calculateGoalProgress(goal, receipts);
+    });
+    // The seed includes a still-seeking-funding project so the progress bar shows
+    // a partial state — funded above zero but below the target (~40%).
+    const partial = progresses.find((p) => p.raisedSats > 0 && !p.isGoalMet);
+    expect(partial, 'a partially-funded goal exists').toBeDefined();
+    expect(partial!.percentComplete).toBeGreaterThan(0);
+    expect(partial!.percentComplete).toBeLessThan(100);
+    // And at least one fully-funded project still exists (the funded+ lifecycle).
+    expect(progresses.some((p) => p.isGoalMet)).toBe(true);
   });
 
   it('concludes the concluded project with a 3402 referencing the task and a payout', async () => {
