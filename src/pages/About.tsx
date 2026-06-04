@@ -3,366 +3,323 @@ import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ExternalLink, FileText, Users, Shield, Briefcase, ArrowLeft, TrendingUp } from 'lucide-react';
+import {
+  ArrowLeft,
+  ExternalLink,
+  GitFork,
+  Users,
+  Shield,
+  Briefcase,
+  Coins,
+  ListChecks,
+  Network,
+} from 'lucide-react';
+
+const GITHUB_URL = 'https://github.com/vcavallo/catallax-reference-client';
 
 export default function About() {
   return (
     <>
       <Helmet>
-        <title>About Catallax - Decentralized Gig Work</title>
-        <meta name="description" content="Learn about the Catallax protocol for pseudonymous contract work on Nostr" />
+        <title>About — Grantless</title>
+        <meta
+          name="description"
+          content="How Grantless works: a permissionless, pleb-funded grant ecosystem built on open curation, Web of Trust, and the Catallax protocol."
+        />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-8">
-        {/* Back Button */}
-        <Button variant="outline" asChild>
-          <Link to="/catallax">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
+      <div className="container mx-auto max-w-3xl px-4 py-8">
+        <div className="space-y-10">
+          {/* Back */}
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to browse
+            </Link>
+          </Button>
 
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">About Catallax</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            An open protocol that enables pseudonymous contract work economies on Nostr
-          </p>
-        </div>
+          {/* Header */}
+          <header className="space-y-3">
+            <h1 className="text-4xl font-bold">About Grantless</h1>
+            <p className="text-xl text-muted-foreground">The Invisible Handout.</p>
+            <p className="text-base text-muted-foreground">
+              Grantless is an open protocol that lets any team or individual participate in a
+              permissionless, pleb-funded grant ecosystem. There are no centralized holders of
+              purse strings, clutchers of pearls, nor any other gatekeeper standing between you and
+              funding. The only thing in your way is <em>you</em>: work on something people actually want to
+              crowdfund.
+            </p>
+          </header>
 
-        {/* Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              How It Works
-            </CardTitle>
-            <CardDescription>
-              Three roles work together to create a decentralized labor market
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center space-y-2">
-                <Briefcase className="h-8 w-8 mx-auto text-blue-600" />
-                <h3 className="font-semibold">Patrons</h3>
-                <p className="text-sm text-muted-foreground">
-                  Broadcast paid gigs and fund escrows
-                </p>
-              </div>
-              <div className="text-center space-y-2">
-                <Users className="h-8 w-8 mx-auto text-green-600" />
-                <h3 className="font-semibold">Free Agents</h3>
-                <p className="text-sm text-muted-foreground">
-                  Work jobs anonymously and get paid
-                </p>
-              </div>
-              <div className="text-center space-y-2">
-                <Shield className="h-8 w-8 mx-auto text-purple-600" />
-                <h3 className="font-semibold">Arbiters</h3>
-                <p className="text-sm text-muted-foreground">
-                  Hold funds in escrow and judge outcomes
-                </p>
-              </div>
+          {/* The roles */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Who's involved</h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
+                    Applicants &amp; teams
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Open-source teams and individuals who post a project they want funded. They set
+                  the goal, pick an arbiter, and (often) do the work themselves.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Coins className="h-5 w-5 text-green-600" />
+                    Funders (plebs)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Anyone who wants a project to exist. They crowdfund a project's goal with sats —
+                  no application, no committee, no permission.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Shield className="h-5 w-5 text-purple-600" />
+                    Arbiters
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Trusted third parties who hold the pooled funds in escrow and release them when the
+                  work is delivered (or refund the crowd if it isn't). The applicant chooses one —
+                  carefully, since the sats pass through them.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Users className="h-5 w-5 text-amber-600" />
+                    Curators
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  The people whose vouching decides who shows up here. A curator publishes a list of
+                  applicants (and a list of trusted arbiters). You browse <em>through</em> a curator's
+                  eyes — and you choose which curator to trust. (Hint: it doesn't have to be OpenSats, but it <em>can be</em>. ...That is, if they were participating here)
+                </CardContent>
+              </Card>
             </div>
+          </section>
 
-            <div className="pt-4 border-t">
-              <p className="text-center text-muted-foreground">
-                Built on Nostr for censorship resistance and Lightning for instant payments.
-                <br />
-                <strong>Everyone wins.</strong>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* How it works */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">How it works</h2>
+            <ol className="list-decimal space-y-2 pl-6 text-sm text-muted-foreground">
+              <li>
+                You pick a <strong>curator</strong> to browse. You see the applicants that curator
+                vouches for, and their projects.
+              </li>
+              <li>
+                An applicant <strong>posts a project</strong> — a crowdfunding task with a goal in
+                sats — and assigns an <strong>arbiter</strong> from the curator's trusted set.
+              </li>
+              <li>
+                The crowd <strong>funds</strong> it. Contributions are custodied by the arbiter, not
+                by Grantless and not by any central treasury ("Grantless" isn't even an organization... it's just a dumb UI).
+              </li>
+              <li>
+                A <strong>worker</strong> (often the team itself) does the work and marks it
+                submitted.
+              </li>
+              <li>
+                The arbiter <strong>concludes</strong> the project: release the pooled sats to the
+                worker, or refund the crowd.
+              </li>
+            </ol>
+            <p className="text-sm text-muted-foreground">
+              Every step is an open event on Nostr. No privileged account, no app-controlled wallet,
+              no off switch that anyone but the participants can reach.
+            </p>
+          </section>
 
-        {/* Demo Instructions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Using This Demo</CardTitle>
-            <CardDescription>
-              This is a demonstration client for the Catallax protocol
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-2">
-              <p><strong>1. Connect:</strong> Log in with your Nostr account or create one</p>
-              <p><strong>2. Explore:</strong> Browse available tasks and arbiters in the Discover tab</p>
-              <p><strong>3. Participate:</strong> Create tasks as a patron, apply as a worker, or offer arbiter services</p>
-              <p><strong>4. Transact:</strong> Use Lightning payments (demo mode available) for escrow and payouts</p>
-            </div>
-            <div className="mt-4 p-3 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>Note:</strong> This is experimental software. The protocol is still in development.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <Separator />
 
-        {/* Tips for Successful Testing */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tips for a Successful Test</CardTitle>
-            <CardDescription>
-              Guidelines for each role to ensure smooth testing experience
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Patron Section */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-blue-600" />
-                As a Patron / Task Creator
-              </h3>
-              <div className="space-y-3 text-sm">
-                <p>Click the "Create Task" button.</p>
-                <p>If you expect your task to actually be "worked" by someone, be sure to make it viable. Have a clear deliverable and a reasonable price (probably quite low, since we're playing around here).</p>
-                <p>Choose the arbiter with the lowest fee - probably that flat-rate 100 sats one for now.</p>
-                <p>Go to "Settings" and flip the toggle so that you're in live payments mode.</p>
-                <p>Once you've created your task, make sure to fund it! Find your new task in your Dashboard and either "Manage" or "Fund Escrow". This lightning payment will go to the Arbiter you've chosen.</p>
-                <p>The payments are currently a bit wonky. You probably want to click "Pay & Auto-detect" before you make the lightning payment. If that fails, you can use the "I paid, continue" button.</p>
-                <p>Once you see your task as "funded" in the Dashboard, it's time to either wait for someone to contact you or to go out looking for a worker.</p>
-                <p>When you and a worker agree, you'll want to add them as the assigned worker on the task. At the moment, you have to add their key as hex (sorry). You can use <a href="https://nwak.nostr.technology" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">nak</a> to get their public key hex: paste their npub and look for "public key hex" on the left. I'll fix this soon to allow npubs directly. Add them and click "Assign" and the task should transition to "in progress".</p>
-                <p>Once the worker submits their task as completed, the Arbiter will review (and probably contact you to discuss). If all goes well, the payment will be released to the worker and the task will be marked as concluded by the Arbiter. If the work isn't acceptable, the Arbiter will refund you the amount held in escrow (less their fee, probably).</p>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Free Agent Section */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <Users className="h-5 w-5 text-green-600" />
-                As a Free Agent / Task Worker
-              </h3>
-              <div className="space-y-3 text-sm">
-                <p>Check out the "Discover" tab and look for tasks that are in the "funded" state. This means that the Patron has funded the escrow and the money is held in trust, waiting for someone to do the job correctly.</p>
-                <p><strong>If you want to be assured you'll get paid, make sure you're accepted as the worker first!</strong> There's nothing stopping you from just fulfilling the task, but the norm here is that you will get in touch with the Patron and they will select you to do the work. Once they assign you to the task, you have more certainty that you'll be paid by the Arbiter.</p>
-                <p>Do the job, come back to the task and click "Manage": here you'll find a "Mark work as submitted" button. Click that, and the task will progress to "submitted".</p>
-                <p>Depending on the task, you probably also need to talk to the Arbiter and Patron to confirm things. This happens out of band.</p>
-                <p>Now you wait for the Arbiter to judge your work and release payment to you.</p>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Arbiter Section */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <Shield className="h-5 w-5 text-purple-600" />
-                As an Arbiter / Escrow Holder
-              </h3>
-              <div className="space-y-3 text-sm">
-                <p>Use the "Create Arbiter Service" button. Fill out the form. Since we're testing here, you probably want to choose a very low "flat fee" or a small percentage.</p>
-                <p>Once you've published your service, wait around or go advertise yourself. If you've read the above, you get an idea of your role.</p>
-                <p>Patrons <em>should</em> contact you first before posting a task with you - since if you're not interested you might just ignore their task and the escrow money they send you will basically be a donation. lol, nobody told them to do that.</p>
-                <p>Assuming you have consented to take a task, you'll subsequently receive zap payments for escrow amounts, and you should be proactive about reviewing submitted work. Click on "Manage" for a given task to decide to "Pay worker" or "Refund Patron". Like I said, the payments and zap splits are still a bit buggy, but the idea is you should disperse agreed-upon payments and keep whatever fees you were owed.</p>
-                <p>Once you complete this payment step, you should be brought to the "Task Conclusion" section where you can report whether the task was done correctly, rejected, etc.</p>
-                <p>That's the end of your job. Enjoy your fees.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Grape Rank Section */}
-        <Card id="grape-rank">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Grape Rank
-            </CardTitle>
-            <CardDescription>
-              Trust scoring system for Nostr identities
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
+          {/* Curation: dlists, WoT, PoV */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+              <ListChecks className="h-6 w-6" />
+              OpenSets, not OpenSats
+            </h2>
+            <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                In years past, the author of Catallax had been working on a decentralized, subjective trust protocol in the substrate of a now-defunct "web3" social networking protocol. Aside from a few arcane git repositories, the only artifact from those times is{' '}
-                <a
-                  href="https://gist.github.com/vcavallo/e008ed60968e9b5c08a9650c712f63bd"
+                Grantless has no "approved grantees" list living in a database somewhere. Who shows
+                up is decided by
+                {' '}<a
+                  href="https://nostrhub.io/naddr1qvzqqqrcvypzpef89h53f0fsza2ugwdc3e54nfpun5nxfqclpy79r6w8nxsk5yp0qy2hwumn8ghj7un9d3shjtnyd968gmewwp6kyqqnv3jkxetww3exzmrf0fjkgttvd9ehgucxgd7rv"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
+                  className="underline underline-offset-4 hover:text-foreground"
                 >
-                  this gist
-                </a>
-                , and a lot of scattered nostr notes.
+                  dlists
+                </a>{' '}
+                — decentralized, curated lists (we like to
+                call them <strong>OpenSets</strong>) published openly on Nostr. A curator says "these
+                are the people I vouch for", signs it, and that's it. Anyone can do it.
+              </p>
+              <p className="rounded-md bg-muted px-4 py-3">
+                The joke writes itself: <strong>OpenSets are more powerful and more permissionless
+                  than OpenSats.</strong> Instead of one fund deciding who deserves money behind closed
+                doors, anyone can be a curator, anyone can be funded, and the lists are public,
+                forkable, and yours to ignore.
+              </p>
+              <p>
+                Trust here is <strong>Web of Trust (WoT)</strong>: it flows from people you already
+                trust, not from a logo. And it's always a <strong>point of view (PoV)</strong> —
+                <em>your</em> point of view, derived from who you (and the curators you choose)
+                follow and vouch for. The app never grants trust; it only reflects yours. Two people
+                can browse Grantless and honestly see different worlds, because they trust different
+                curators.
               </p>
             </div>
+          </section>
 
-            <div className="space-y-3">
+          {/* The ladder */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+              <Network className="h-6 w-6" />
+              The decentralization ladder
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              There's more than one way to "decentralize" grants. Most efforts stop a rung or two up.
+              Here's the ladder, and where Grantless sits:
+            </p>
+            <ol className="space-y-3 text-sm text-muted-foreground">
+              <li>
+                <strong>1. Just have alternatives.</strong> More grant bodies than one — but each is
+                still its own centralized gatekeeper.
+              </li>
+              <li>
+                <strong>2. A forkable platform.</strong> Anyone can fork the software and run their
+                own grant site. Better, but the forks don't talk to each other.
+              </li>
+              <li>
+                <strong>3. A single protocol.</strong> Anyone can permissionlessly publish events
+                that behave like a grant body, using their own UI, relay, and hand-picked "who to
+                trust" list.
+              </li>
+              <li>
+                <strong>4. An open curation system.</strong> Anyone can be a curator; a user's trust
+                graph determines their point of view; one UI works for anyone, against any relay
+                (their own or a shared one), for their own goals. No forks required, no hardcoded
+                lists, no central moderation.
+              </li>
+            </ol>
+            <p className="rounded-md bg-muted px-4 py-3 text-sm text-muted-foreground">
+              <strong>Grantless is already at rung 4.</strong> We ship a default relay for
+              convenience, but you're free to point at any relay you want — and any curator,
+              including yourself.
+            </p>
+          </section>
+
+          <Separator />
+
+          {/* Become an arbiter */}
+          <section className="space-y-3">
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+              <Shield className="h-6 w-6 text-purple-600" />
+              Want to be an Arbiter?
+            </h2>
+            <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                It turns out{' '}
+                Arbiters are the trust backbone of a project. When a project is funded, the crowd's
+                sats are custodied by the arbiter until the work is judged — so arbiters are chosen
+                for their reputation, and they optionally earn a fee for the service and the risk.
+              </p>
+              <p>
+                To be offered to applicants, an arbiter needs two things: to <strong>announce a
+                  service</strong> (your terms and fee), and to be <strong>included in a curator's
+                    trusted-arbiter list</strong>. Applicants can only pick arbiters their curator
+                vouches for.
+              </p>
+              <p className="italic">
+                A one-click "Become an Arbiter" flow (like "Post a project") is coming. For now, an
+                arbiter service can be published from the Catallax dashboard.
+              </p>
+            </div>
+          </section>
+
+          {/* Become a curator */}
+          <section className="space-y-3">
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+              <Users className="h-6 w-6 text-amber-600" />
+              Want to be a Curator?
+            </h2>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                A curator is anyone willing to say, publicly, "these are the applicants and arbiters
+                I vouch for." Browsers who trust you will see the world through your lists. You don't
+                need anyone's permission — you need to publish the lists.
+              </p>
+              <p>
+                Any public charity currently in operation could just switch over to the Grantless protocol, publish their own lists and act as their own arbiters.
+              </p>
+              <p>
+                Today, those curated lists (the OpenSets behind Grantless) are published
+                through <strong>Brainstorm</strong>, as a convenient UI. Head to{' '}
                 <a
-                  href="https://njump.me/npub1u5njm6g5h5cpw4wy8xugu62e5s7f6fnysv0sj0z3a8rengt2zqhsxrldq3"
+                  href="https://tags.brainstorm.world"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
+                  className="underline underline-offset-4 hover:text-foreground"
                 >
-                  david "straycat"
-                </a>
-                {' '}has basically already solved the same problem on Nostr!
+                  tags.brainstorm.world
+                </a>{' '}
+                to create a <code>grantless-applicants</code> list (and a{' '}
+                <code>grantless-arbiter</code> list) from your point of view; Grantless will pick
+                them up automatically. Or you can just use nak or any other client, if you prefer. You just have to publish Kind 39999 events...
+              </p>
+              <p className="italic">
+                A native curation experience inside Grantless — so you never have to leave to curate —
+                is on the roadmap.
               </p>
             </div>
+          </section>
 
-            <div className="space-y-3">
-              <p>You can learn more here:</p>
-              <ul className="list-disc pl-6 space-y-1">
-                <li>
-                  <a
-                    href="https://straycat.brainstorm.social/about.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-foreground"
-                  >
-                    https://straycat.brainstorm.social/about
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://straycat.brainstorm.social/about-trusted-assertions.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-foreground"
-                  >
-                    https://straycat.brainstorm.social/about-trusted-assertions
-                  </a>
-                </li>
-              </ul>
-            </div>
+          <Separator />
 
-            <div className="space-y-3">
-              <p>But the important bits as it relates to Catallax are as follows:</p>
-            </div>
-
-            <div className="space-y-3">
-              <p>
-                Trust and Reputation are subjective: My opinion of npubX might be very different than your opinion of npubX. Consequentially, the networks of individuals with whom we each want to interact or do business may be divergent. Our experience with networked software should be similarly subjective and personalized. Centralized parties cannot provide this level of personalization.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <p>
-                As it stands now, the "reputation" that GrapeRank and VerifiedFollows provide is built off of basic nostr primitives: Following, Muting, Reporting, etc. In the future, specialized non-social clients (like Catallax, marketplaces, games, etc.) will be able to supply the raw materials to crunch and yield reputation scores. <strong>That means</strong> that your history and interactions <em>on Catallax</em> will inform your <em>Catallax reputation</em>. This can be <strong>different</strong> than your reputation on social clients. Maybe you are extremely trustworthy with regard to freelance software development, but you are a rampant shitposter and flamewar-starter - people block and mute you on nostr socials, but that doesn't mean its not a joy to work with you on software projects. One size <em>cannot</em> fit all, and shouldn't. Networked society simply cannot succeed until we separate these concerns.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <p>
-                At the moment, as Brainstorm and{' '}
-                <a
-                  href="https://github.com/nostr-protocol/nips/pull/1534"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
-                >
-                  NIP-85
-                </a>
-                {' '}are built out, there are two demo "Points of View" for the GrapeRank and VerifiedFollows: A sample "Catallax 'global' "{' '}
-                <a
-                  href="https://njump.me/npub1qwe3auavzmlfzkul67j02atcntgd8hwynvj2794zjmuuly6czcds69qldl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
-                >
-                  npub
-                </a>
-                , and the "Pretty Good Freedom Tech"{' '}
-                <a
-                  href="https://njump.me/npub120dtguu42s45m7wf6kejjdzq8d637z5g9e5mhrwc5esd7w547qks8sf6jp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
-                >
-                  npub
-                </a>
-                . One day, you'll be able to use <em>your own</em> POV, or that of a friend or other trusted party. <strong>Note:</strong> A client app providing <em>its own</em> Grapevine as a "global opinion" is a double-edged sword. It could be a value-add if they have taken the time to carefully curate the individuals whom it considers to be trustworthy. Or it could become another centralizing "Credit Agency" (in the bad way). But since we're swimming in the warm waters of open protocols and Exit, you'll always be able to simply ignore the "central/global" opinions and splinter off on your own network.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="h-5 w-5" />
-                  <h3 className="font-semibold">Learn More</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Visit the main Catallax website for detailed documentation, principles, and roadmap.
-                </p>
-                <Button asChild className="w-full">
-                  <a
-                    href="https://catallax.network"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Learn more about Catallax here
-                    <ExternalLink className="h-4 w-4 ml-2" />
+          {/* Fork it */}
+          <section>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GitFork className="h-5 w-5" />
+                  Fork this and deploy your own version
+                </CardTitle>
+                <CardDescription>
+                  Grantless is a reference client for an open protocol — not a walled garden. Run your
+                  own, point it at your own relay, ship your own defaults.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild>
+                  <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                    View the source on GitHub
+                    <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </section>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  <h3 className="font-semibold">Technical Specification</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Read the draft Nostr Improvement Proposal (NIP) that defines the Catallax protocol.
-                </p>
-                <Button variant="outline" asChild className="w-full">
-                  <a
-                    href="https://github.com/nostr-protocol/nips/pull/1714"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Draft NIP
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center text-sm text-muted-foreground pt-8 border-t">
-          <p>
-            Catallax is a protocol, not a platform. This demo client is built to showcase the possibilities.
-          </p>
-          <p className="mt-2">
-            by{' '}
-            <a
-              href="https://njump.me/npub19ma2w9dmk3kat0nt0k5dwuqzvmg3va9ezwup0zkakhpwv0vcwvcsg8axkl"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-foreground"
-            >
-              vinney
-            </a>
-            {' '}• Vibed with{' '}
-            <a
-              href="https://soapbox.pub/mkstack"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-foreground"
-            >
-              MKStack
-            </a>
-          </p>
+          {/* Footer */}
+          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
+            <p>
+              Grantless is built on Nostr's {' '}
+              <Link to="https://catallax.network" className="underline underline-offset-4 hover:text-foreground">
+                Catallax
+              </Link>{' '}
+              meta-protocol.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

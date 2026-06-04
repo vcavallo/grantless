@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 
 import GrantlessBrowse from "./pages/GrantlessBrowse";
+import ApplicantProjects from "./pages/ApplicantProjects";
 import CatallaxDashboard from "./pages/CatallaxDashboard";
 import { TaskDetail } from "./pages/TaskDetail";
 import About from "./pages/About";
@@ -14,6 +15,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<GrantlessBrowse />} />
         <Route path="/c/:npub" element={<GrantlessBrowse />} />
+        <Route path="/p/:npub" element={<ApplicantProjects />} />
         <Route path="/catallax" element={<CatallaxDashboard />} />
         <Route path="/task/:nip19" element={<TaskDetail />} />
         <Route path="/about" element={<About />} />

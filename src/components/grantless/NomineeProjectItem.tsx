@@ -51,22 +51,24 @@ export function NomineeProjectItem({ task, progress }: { task: TaskProposal; pro
   const isConcluded = task.status === 'concluded';
 
   return (
-    <div className={`space-y-2 rounded-md border px-3 py-2 text-sm ${isConcluded ? 'opacity-60' : ''}`}>
-      <Link
-        to={`/task/${naddr}`}
-        className="flex items-center justify-between gap-3 transition-colors hover:text-primary"
-      >
-        <span className="truncate font-medium">{task.content.title}</span>
+    <Link
+      to={`/task/${naddr}`}
+      className={`group block space-y-2 rounded-md border px-3 py-2 text-sm transition-colors hover:border-primary/50 hover:bg-muted/50 ${isConcluded ? 'opacity-60' : ''}`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="truncate font-medium transition-colors group-hover:text-primary">
+          {task.content.title}
+        </span>
         <Badge variant="secondary" className={`shrink-0 ${getStatusColor(task.status)}`}>
           {task.status}
         </Badge>
-      </Link>
+      </div>
 
       {showFunding && <FundingLine progress={progress!} />}
 
       {task.arbiterPubkey && (
         <ArbiterLine arbiterPubkey={task.arbiterPubkey} isProposer={task.arbiterPubkey === task.patronPubkey} />
       )}
-    </div>
+    </Link>
   );
 }

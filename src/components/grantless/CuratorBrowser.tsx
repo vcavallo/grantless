@@ -19,6 +19,7 @@ import type { TaskProposal } from '@/lib/catallax';
 import { genUserName } from '@/lib/genUserName';
 import { NomineeGrid } from './NomineeGrid';
 import { BrowseControls, type BrowseControlsState } from './BrowseControls';
+import { CreateProjectDialog } from './CreateProjectDialog';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -173,27 +174,24 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="curator-select">Browse a curator</Label>
-        <Select value={selected} onValueChange={selectCurator}>
-          <SelectTrigger id="curator-select" className="w-full max-w-sm">
-            <SelectValue placeholder="Choose a curator…" />
-          </SelectTrigger>
-          <SelectContent>
-            {curators.map((pubkey) => (
-              <SelectItem key={pubkey} value={pubkey}>
-                <span className="font-medium">{curatorLabel(pubkey)}</span>
-                <span className="ml-2 font-mono text-xs text-muted-foreground">{shortNpub(pubkey)}</span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {relays.length > 0 && (
-          <p className="break-all text-xs text-muted-foreground">
-            Discovered from {relays.length} relay{relays.length === 1 ? '' : 's'}:{' '}
-            <span className="font-mono">{relays.join(', ')}</span>
-          </p>
-        )}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <Label htmlFor="curator-select">Browse a curator</Label>
+          <Select value={selected} onValueChange={selectCurator}>
+            <SelectTrigger id="curator-select" className="w-full max-w-sm">
+              <SelectValue placeholder="Choose a curator…" />
+            </SelectTrigger>
+            <SelectContent>
+              {curators.map((pubkey) => (
+                <SelectItem key={pubkey} value={pubkey}>
+                  <span className="font-medium">{curatorLabel(pubkey)}</span>
+                  <span className="ml-2 font-mono text-xs text-muted-foreground">{shortNpub(pubkey)}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <CreateProjectDialog />
       </div>
 
       {!selected && (

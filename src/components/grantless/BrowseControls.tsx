@@ -28,11 +28,13 @@ export interface BrowseControlsState {
 
 interface BrowseControlsProps extends BrowseControlsState {
   onChange: (patch: Partial<BrowseControlsState>) => void;
+  /** Show the "hide empty applicants" toggle — irrelevant on a single-applicant view. */
+  showHideEmpty?: boolean;
 }
 
 /** The browse filter/sort bar: status chips, semantic toggles, and a sort select. */
 export function BrowseControls(props: BrowseControlsProps) {
-  const { statuses, sort, seekingFunding, needsWorker, hideEmpty, onChange } = props;
+  const { statuses, sort, seekingFunding, needsWorker, hideEmpty, onChange, showHideEmpty = true } = props;
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
@@ -46,7 +48,11 @@ export function BrowseControls(props: BrowseControlsProps) {
           aria-label="Filter by status"
         >
           {STATUSES.map((s) => (
-            <ToggleGroupItem key={s} value={s} className="text-xs">
+            <ToggleGroupItem
+              key={s}
+              value={s}
+              className="text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+            >
               {s.replace('_', ' ')}
             </ToggleGroupItem>
           ))}
@@ -76,10 +82,12 @@ export function BrowseControls(props: BrowseControlsProps) {
           <Switch id="f-needs-worker" checked={needsWorker} onCheckedChange={(v) => onChange({ needsWorker: v })} />
           <Label htmlFor="f-needs-worker" className="text-xs">Needs a worker</Label>
         </div>
-        <div className="flex items-center gap-2">
-          <Switch id="f-hide-empty" checked={hideEmpty} onCheckedChange={(v) => onChange({ hideEmpty: v })} />
-          <Label htmlFor="f-hide-empty" className="text-xs">Hide empty applicants</Label>
-        </div>
+        {showHideEmpty && (
+          <div className="flex items-center gap-2">
+            <Switch id="f-hide-empty" checked={hideEmpty} onCheckedChange={(v) => onChange({ hideEmpty: v })} />
+            <Label htmlFor="f-hide-empty" className="text-xs">Hide empty applicants</Label>
+          </div>
+        )}
       </div>
     </div>
   );
