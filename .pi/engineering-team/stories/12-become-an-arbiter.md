@@ -1,6 +1,6 @@
 # Story 12: Become an Arbiter
 
-**Status:** Draft
+**Status:** Done
 **Created:** 2026-06-04
 **Type:** Feature
 
@@ -104,4 +104,4 @@ Clean, and the story actively reinforces the prime directive:
 - Intake: `.pi/engineering-team/stories/_intake.md` — 2026-06-04 "Become an Arbiter (Grantless flow)"
 - ADR: `.pi/engineering-team/decisions/0011-become-an-arbiter.md`
 - Test plan: `.pi/engineering-team/stories/12-become-an-arbiter.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/12-become-an-arbiter.md` (PASS)
