@@ -200,3 +200,83 @@ funding, needs-a-worker, hide-empty-applicants (no text search); and include cur
 bar on cards, hide-concluded (default on), status filter, sorts (newest/funding/largest goal).
 Extras as chosen. Shareable /c/:npub curator URL. Per-project funding fetched in one batch.
 **Status:** → `stories/11-browse-under-curator.md` (Approved). Running all phases.
+
+## 2026-06-04 — Mid-polish batch (About page + browse copy + applicant pages)
+**Raw:** Add a short intro line under "The Invisible Handout" (provided copy) with a "how does
+this work?" link to the About page; swap the header "Catallax dashboard" link for "About"; write a
+first-draft Grantless About page (incl. a "Fork this and deploy your own version" → GitHub link);
+cap each applicant tile at 3 projects with a "view more…" link and make the name + link go to a
+page of just that applicant's projects (some applicants will have dozens); remove the "Discovered
+from N relay…" helper text under the curator picker.
+**Classified:** Mid-polish (Implementer-level, no full phase path — matches the 2.5/seed precedent
+for small UI work). Done directly:
+- `GrantlessBrowse`: intro paragraph + "how does this work?" link; header link → `/about`.
+- `About` (`/about`): rewrote the Catallax-protocol page into a **scoped Grantless About** first
+  draft — roles, the flow, OpenSets-not-OpenSats / dlists / WoT / PoV, the 4-rung decentralization
+  ladder (Grantless = rung 4, default relay framing), "Want to be an Arbiter?" + "Want to be a
+  Curator?" sections, and a "Fork this and deploy your own version" GitHub link. (The old Catallax
+  about content is in git history; the Catallax dashboard still owns the protocol-level explainer.)
+- New `/p/:npub` `ApplicantProjects` page (reuses `useTaskProposals` + `groupTasksByPatron` +
+  `useGoalsProgress`); `NomineeCard` previews 3 projects, links name + "view N more…" to it.
+- Removed the relay-provenance line in `CuratorBrowser`.
+Gates: tsc + eslint clean; unit (64) + seed e2e (11) + build pass. Playwright not run here
+(NixOS env lacks libnspr4/nss for the bundled chromium); reasoned the 3-cap keeps the
+concluded-visible browse spec green (concluded-alice is seeded last → newest → in top-3).
+**Pre-deploy chore satisfied:** the epic's "About page (pre-deploy)" item — first draft landed;
+user to revise copy.
+
+## 2026-06-04 — Become an Arbiter (Grantless flow) [proposed story/epic]
+**Raw:** "We don't have an 'I want to be an Arbiter' flow anywhere." Add a "Become an Arbiter" UX
+(like "Post a project"), surfaced on the browse header and explained on the About page among how
+arbiters work.
+**Classified:** Feature — next-up candidate. NOT yet a story; capturing intent.
+**Protocol shape (known):** an arbiter announces a **kind 33400** service (terms + fee). A
+TaskProposalForm/arbiter-service form already exists on `/catallax` (CatallaxDashboard's "Create
+Arbiter Service"); Grantless needs a first-class affordance that reuses that publish path. **Key
+gap:** being *announced* isn't enough to be *selectable* — an arbiter must also appear in a
+curator's `grantless-arbiter` 30392 list (curator action, today via Brainstorm). So the in-app
+flow gets you announced; getting vouched is the curator's call. Surface that clearly.
+**Open questions for planning:** dialog vs route (mirror CreateProjectDialog?); minimal fields
+(flat-fee vs %); what to tell a freshly-announced arbiter about getting onto a curator's list;
+whether to show "you're announced but not yet vouched by <curator>" state. The About page already
+has a "Want to be an Arbiter?" section as the explanatory anchor.
+
+## 2026-06-04 — Become a Curator (Grantless flow) [proposed story/epic — likely later]
+**Raw:** "What would we need if someone is interested in becoming a curator? Maybe instructions for
+what they should go do at tags.brainstorm.world… and maybe one day a UI/UX for that here."
+**Classified:** Feature — later than the arbiter flow. NOT yet a story; capturing intent.
+**Protocol shape (known):** a curator's set = a **kind 30392** trusted-list signed by Brainstorm's
+agent, observed-by the curator, source-tagged `grantless-applicants` / `grantless-arbiter` (see the
+epic resolver). Minting/publishing those lists is **Brainstorm's job today** — Grantless only
+consumes them (epic "Out of epic": the Brainstorm-side minting UI is not ours). **Phase 1
+(cheap, done as copy):** instructions on the About page pointing to `tags.brainstorm.world` to
+publish the two lists from your PoV — already drafted in the "Want to be a Curator?" section.
+**Phase 2 (later, bigger):** a native in-Grantless curation experience so a curator never leaves —
+this is a real lift (auth as the observer, list authoring, signing) and may belong to Brainstorm,
+not Grantless. Flag for a roundtable before committing.
+
+## 2026-06-04 — "My funding activity" page (Funder profile) [future epic]
+**Raw:** "How would we go about adding a 'my funding activity' page where a Funder user can show off
+all the times they've contributed to crowdfunds — which ones succeeded, which were refunded, etc."
+**Classified:** Feature / future epic. NOT yet a story; capturing intent + the protocol angle.
+**Why it's interesting:** gives Funders (the plebs) a reputation surface — a public, verifiable
+record of "I backed these projects," which is itself WoT signal and a flex. Could be the Funder
+analogue of the applicant `/p/:npub` page and the arbiter's track record.
+**Protocol shape (to verify before planning):**
+- A contribution = a **kind 9735** zap receipt the funder caused, pointing at a project's **9041**
+  goal (custodied by the arbiter). To list "my contributions" we need receipts attributable to the
+  funder. NOTE the known wrinkle: a real 9735 is signed by the LNURL server, not the funder; the
+  funder identity lives in the embedded `description` (the zap request, kind 9734) / `P` upper-tag.
+  Our mock seed signs receipts as the funder — real data won't. **Resolver must key off the zap
+  request's sender, not the receipt's pubkey.** Verify against NIP-57 during architecture.
+- **Outcome per contribution** (succeeded / refunded / still-open) comes from the task's latest
+  **33401** status + the **3402** conclusion (resolution successful → paid worker; failed/cancelled
+  → refund). Reuse the latest-wins task dedupe + `calculateGoalProgress` + conclusion parsing.
+- Querying receipts by an arbitrary funder is the hard part — relays index `#e`/`#p`, not the
+  embedded zap-request sender. Likely need to fetch a project's receipts (we already do, via
+  `useGoalsProgress`) and attribute, OR query the funder's own 9734 zap requests if they publish
+  them. **Open question for architecture: can we cheaply find "all goals this pubkey funded"?**
+**Decisions deferred to planning:** route (`/f/:npub`? or merge into a unified profile page with
+applicant/arbiter/funder tabs); privacy (zaps are public, but a "show off" page is opt-in framing);
+mock vs real-zap behavior (payments are still mocked — this page will look different against real
+LNURL receipts). Flag for a roundtable; depends on settling the real-9735 attribution path.
