@@ -102,6 +102,6 @@ Clean, and the story actively reinforces the prime directive:
 
 ## Linked artifacts
 - Intake: `.pi/engineering-team/stories/_intake.md` — 2026-06-04 "Become an Arbiter (Grantless flow)"
-- ADR: (filled in after Architecture phase)
+- ADR: `.pi/engineering-team/decisions/0011-become-an-arbiter.md`
 - Test plan: (filled in after Test Design phase)
 - Review: (filled in after Review phase)
