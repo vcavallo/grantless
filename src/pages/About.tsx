@@ -238,10 +238,16 @@ export default function About() {
                     trusted-arbiter list</strong>. Applicants can only pick arbiters their curator
                 vouches for.
               </p>
-              <p className="italic">
-                A one-click "Become an Arbiter" flow (like "Post a project") is coming. For now, an
-                arbiter service can be published from the Catallax dashboard.
+              <p>
+                Announcing a service is permissionless and takes a moment — but remember, it doesn't
+                make you selectable until a curator vouches for you.
               </p>
+              <Button asChild>
+                <Link to="/?compose=arbiter">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Become an Arbiter
+                </Link>
+              </Button>
             </div>
           </section>
 

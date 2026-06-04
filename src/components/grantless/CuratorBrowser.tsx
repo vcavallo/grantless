@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { nip19 } from 'nostr-tools';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useApplicantCurationLists } from '@/hooks/useApplicantCurationLists';
 import { useNomineeProfiles } from '@/hooks/useNomineeProfiles';
@@ -20,6 +20,7 @@ import { genUserName } from '@/lib/genUserName';
 import { NomineeGrid } from './NomineeGrid';
 import { BrowseControls, type BrowseControlsState } from './BrowseControls';
 import { CreateProjectDialog } from './CreateProjectDialog';
+import { BecomeArbiterDialog } from './BecomeArbiterDialog';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,6 +51,8 @@ function shortNpub(pubkey: string): string {
  */
 export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const autoOpenArbiter = searchParams.get('compose') === 'arbiter';
   const { lists, status, relays } = useApplicantCurationLists();
   const [savedCurator, setSavedCurator] = useLocalStorage<string>(STORAGE_KEY, '');
 
@@ -191,7 +194,10 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
             </SelectContent>
           </Select>
         </div>
-        <CreateProjectDialog />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <CreateProjectDialog />
+          <BecomeArbiterDialog autoOpen={autoOpenArbiter} />
+        </div>
       </div>
 
       {!selected && (

@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { CATALLAX_KINDS, generateServiceId, type FeeType } from '@/lib/catallax';
+import { buildArbiterAnnouncementTemplate, type FeeType } from '@/lib/catallax';
 
 interface ArbiterAnnouncementFormProps {
   onSuccess?: () => void;
@@ -38,42 +38,21 @@ export function ArbiterAnnouncementForm({ onSuccess }: ArbiterAnnouncementFormPr
     e.preventDefault();
     if (!user) return;
 
-    const content = {
+    const template = buildArbiterAnnouncementTemplate({
       name: formData.name,
       about: formData.about || undefined,
-      policy_text: formData.policyText || undefined,
-      policy_url: formData.policyUrl || undefined,
-    };
-
-    const tags: string[][] = [
-      ['d', generateServiceId(formData.name)],
-      ['p', user.pubkey],
-      ['t', 'catallax'],
-      ['fee_type', formData.feeType],
-      ['fee_amount', formData.feeAmount],
-    ];
-
-    if (formData.detailsUrl) {
-      tags.push(['r', formData.detailsUrl]);
-    }
-
-    if (formData.minAmount) {
-      tags.push(['min_amount', formData.minAmount]);
-    }
-
-    if (formData.maxAmount) {
-      tags.push(['max_amount', formData.maxAmount]);
-    }
-
-    categories.forEach(category => {
-      tags.push(['t', category]);
+      policyText: formData.policyText || undefined,
+      policyUrl: formData.policyUrl || undefined,
+      detailsUrl: formData.detailsUrl || undefined,
+      feeType: formData.feeType,
+      feeAmount: formData.feeAmount,
+      minAmount: formData.minAmount || undefined,
+      maxAmount: formData.maxAmount || undefined,
+      categories,
+      pubkey: user.pubkey,
     });
 
-    createEvent({
-      kind: CATALLAX_KINDS.ARBITER_ANNOUNCEMENT,
-      content: JSON.stringify(content),
-      tags,
-    }, {
+    createEvent(template, {
       onSuccess: () => {
         setFormData({
           name: '',

@@ -474,6 +474,55 @@ export function generateServiceId(name: string): string {
   return `${slug}-service`;
 }
 
+export interface ArbiterAnnouncementInput {
+  name: string;
+  about?: string;
+  feeType: FeeType;
+  feeAmount: string;
+  policyText?: string;
+  policyUrl?: string;
+  detailsUrl?: string;
+  minAmount?: string;
+  maxAmount?: string;
+  categories?: string[];
+  /** The announcing arbiter's own pubkey (the `p` tag). */
+  pubkey: string;
+}
+
+/**
+ * Build a kind-33400 arbiter-announcement event template (`{ kind, content, tags }`)
+ * ready to sign/publish. Pure and deterministic — the single source of truth for the
+ * 33400 shape, shared by the lean Grantless "Become an Arbiter" flow and the full
+ * Catallax arbiter-service form. `parseArbiterAnnouncement` reads these tags back, so
+ * the two agree by construction. The `d` is derived from the service name, making a
+ * re-announcement of the same name a replaceable update. No pubkey is privileged:
+ * the announcer is tagged as itself, nothing more.
+ */
+export function buildArbiterAnnouncementTemplate(
+  input: ArbiterAnnouncementInput,
+): { kind: number; content: string; tags: string[][] } {
+  const content: ArbiterAnnouncementContent = { name: input.name };
+  if (input.about) content.about = input.about;
+  if (input.policyText) content.policy_text = input.policyText;
+  if (input.policyUrl) content.policy_url = input.policyUrl;
+
+  const tags: string[][] = [
+    ['d', generateServiceId(input.name)],
+    ['p', input.pubkey],
+    ['t', 'catallax'],
+    ['fee_type', input.feeType],
+    ['fee_amount', input.feeAmount],
+  ];
+  if (input.detailsUrl) tags.push(['r', input.detailsUrl]);
+  if (input.minAmount) tags.push(['min_amount', input.minAmount]);
+  if (input.maxAmount) tags.push(['max_amount', input.maxAmount]);
+  for (const category of input.categories ?? []) {
+    tags.push(['t', category]);
+  }
+
+  return { kind: CATALLAX_KINDS.ARBITER_ANNOUNCEMENT, content: JSON.stringify(content), tags };
+}
+
 export function getStatusColor(status: TaskStatus): string {
   switch (status) {
     case 'proposed': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
