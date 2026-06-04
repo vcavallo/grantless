@@ -5,6 +5,7 @@ export const ALICE = ROSTER.applicants[0];
 export const BOB = ROSTER.applicants[1];
 export const CLEO = ROSTER.curator;
 export const QUINN = ROSTER.curator2;
+export const DAVE = ROSTER.arbiters[0]; // a seeded arbiter (already has a 33400 service)
 
 /**
  * Log in as a seed account by injecting the nostr-login storage shape before the
