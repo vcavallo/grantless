@@ -1,5 +1,7 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
+import { useAppContext } from '@/hooks/useAppContext';
+import { getActiveRelays } from '@/lib/relays';
 import { calculateGoalProgress, type GoalProgress } from '@/lib/catallax';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -75,9 +77,11 @@ async function queryRelaysDirect(
 
 export function useZapGoal(goalId: string | undefined) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery<ZapGoalData | null>({
-    queryKey: ['zap-goal', goalId],
+    queryKey: ['zap-goal', goalId, activeRelays],
     queryFn: async (c) => {
       if (!goalId) return null;
 
@@ -91,11 +95,13 @@ export function useZapGoal(goalId: string | undefined) {
       // Extract the goal's linked addressable event (a tag) if any
       const linkedAddress = goal.tags.find(([name]) => name === 'a')?.[1];
 
-      // Get relays from the goal event, fallback to common relays
+      // Query the user's active relay set together with any relays the goal declares.
+      // The active set is the reliable read path — the goal's embedded `relays` tag can
+      // be stale or unreachable (e.g. a `ws://127.0.0.1` dev relay viewed from another
+      // machine), so we never rely on it alone, and we keep no hardcoded relay fallback
+      // (the active set is the overridable source of truth, per the prime directive).
       const goalRelays = goal.tags.find(([name]) => name === 'relays')?.slice(1) || [];
-      const relaysToQuery = goalRelays.length > 0
-        ? goalRelays
-        : ['wss://relay.primal.net', 'wss://nos.lol', 'wss://relay.damus.io'];
+      const relaysToQuery = [...new Set([...activeRelays, ...goalRelays])];
 
       // Query for zap receipts using direct WebSocket (bypasses NPool issues)
       const receipts = await queryRelaysDirect(

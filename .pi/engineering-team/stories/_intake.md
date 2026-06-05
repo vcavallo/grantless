@@ -303,3 +303,19 @@ query a few popular public relays (catch misrouted receipts); use the WebLN prei
 *contributor* a local "you paid" even if the shared bar lags; consider hosting receipt aggregation;
 tighten `waitForReceipt` to match the specific zapRequestId/bolt11 rather than any receipt referencing
 the goal (the Story-13 review's non-blocking note). Not now — money-safety already holds.
+
+## 2026-06-05 — Fix: detail-page crowdfunding empty (useZapGoal read the goal's embedded relays)
+**Raw:** Index cards showed "backers", but the task detail page's crowdfund section was empty —
+surfaced in a remote-relay/laptop-browser (tailscale) dev setup.
+**Classified:** Bug (obvious) — Implementer (gates) + intake note; no Architecture.
+**Root cause:** the index uses `useGoalsProgress` (queries the **active relay set**), but the detail
+page's `useZapGoal` queried **only the relays embedded in the goal's `relays` tag** via direct
+WebSocket — which the seed wrote as `ws://127.0.0.1:7787`. From a different machine (laptop browser →
+remote relay over tailscale) that localhost is unreachable, so the detail page found zero receipts
+while the index (active set = the tailscale relay) found them. Also a prime-directive smell: a
+hardcoded `primal/nos.lol/damus` fallback relay list.
+**Fix:** `useZapGoal` now queries `union(activeRelays, goalRelays)` (active set via
+`getActiveRelays`, included in the queryKey) and drops the hardcoded fallback. The active set is the
+reliable, overridable read path; the goal's embedded relays are treated as a hint, not the sole
+source. Gates: tsc + eslint + vitest + build clean. (Also relevant in prod if a goal's embedded
+relays ever go stale/unreachable.)
