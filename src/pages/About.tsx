@@ -267,19 +267,46 @@ export default function About() {
                 Any public charity currently in operation could just switch over to the Grantless protocol, publish their own lists and act as their own arbiters.
               </p>
               <p>
-                Today, those curated lists (the OpenSets behind Grantless) are published
-                through <strong>Brainstorm</strong>, as a convenient UI. Head to{' '}
-                <a
-                  href="https://tags.brainstorm.world"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-foreground"
-                >
-                  tags.brainstorm.world
-                </a>{' '}
-                to create a <code>grantless-applicants</code> list (and a{' '}
-                <code>grantless-arbiter</code> list) from your point of view; Grantless will pick
-                them up automatically. Or you can just use nak or any other client, if you prefer. You just have to publish Kind 39999 events...
+                Today, those curated lists (the OpenSets behind Grantless) are published through{' '}
+                <strong>Brainstorm</strong>, a convenient UI. The quickest way to stand up your own
+                curated point of view:
+              </p>
+              <ol className="list-decimal space-y-1 pl-6">
+                <li>
+                  Open the existing{' '}
+                  <a
+                    href="https://tags.brainstorm.world/tag/grantless-applicants/245b3e82b55915b5809adc8f66b70eaedbdb985e087e010477db9921cf71c7ab?tab=default"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
+                    <code>grantless-applicants</code>
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="https://tags.brainstorm.world/tag/grantless-arbiter/b3d9678c93a8a7368cf789eadad61baa9f1ab16207bc2c9b7c5e217f5d464bed?tab=default"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
+                    <code>grantless-arbiter</code>
+                  </a>{' '}
+                  tags on Brainstorm.
+                </li>
+                <li>
+                  <strong>Pin</strong> each tag to yourself — this adopts it from your own point of
+                  view (you can edit the membership to vouch for whomever you like).
+                </li>
+                <li>
+                  <strong>Export</strong> the pinned list, making sure <strong>kind 30392</strong> is
+                  checked. That publishes a 30392 trusted-list observed by your pubkey.
+                </li>
+              </ol>
+              <p>
+                Grantless discovers any pubkey that publishes a <code>grantless-applicants</code>
+                list, so you'll show up in the curator picker automatically. Prefer the command line?
+                Publish the 30392s yourself with nak or any client — Brainstorm is a convenience, not
+                a requirement.
               </p>
               <p className="italic">
                 A native curation experience inside Grantless — so you never have to leave to curate —
