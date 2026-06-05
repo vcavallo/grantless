@@ -107,6 +107,6 @@ Clean:
   prod, curator-wide contributors "show off" page).
 - Related: `src/components/grantless/CrowdfundSection.tsx` (the "N contributors" line), `calculateGoalProgress`
   (`src/lib/catallax.ts` — already aggregates contributors), `genUserName` (the placeholder source).
-- ADR: (filled in after Architecture phase)
+- ADR: `.pi/engineering-team/decisions/0013-contributor-visibility.md`
 - Test plan: (filled in after Test Design phase)
 - Review: (filled in after Review phase)
