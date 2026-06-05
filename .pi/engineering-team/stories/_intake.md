@@ -319,3 +319,21 @@ hardcoded `primal/nos.lol/damus` fallback relay list.
 reliable, overridable read path; the goal's embedded relays are treated as a hint, not the sole
 source. Gates: tsc + eslint + vitest + build clean. (Also relevant in prod if a goal's embedded
 relays ever go stale/unreachable.)
+
+## 2026-06-05 — Perf: crowdfund total loads slowly on prod (useZapGoal query shape) [future]
+**Raw:** On prod the task detail page's crowdfunding total takes a long time to load (and used to
+show 0 with no indicator — the honest loading state was fixed in 00b59ce; this note is the remaining
+*speed* follow-up).
+**Classified:** Performance follow-on. NOT yet a story; capturing intent.
+**Root cause (shape, not relays):** `useZapGoal` (src/hooks/useZapGoal.ts) does the goal fetch, then
+**two sequential `queryRelaysDirect` rounds** — one for `{kinds:[9735],'#e':[goalId]}` and a second
+for `{kinds:[9735],'#a':[linkedAddress]}` — each with an ~8s per-relay timeout across the active
+relay set (now union(active, goal.relays) since c5ca929). On a slow prod relay that can stack toward
+~16s worst case. Relay latency is inherent, but the double round-trip + fixed long timeout make it
+worse than necessary.
+**Options when we do it:** (a) collapse the `#e` + `#a` receipt queries into a SINGLE REQ (two
+filters in one round) — halves the rounds; (b) lower / make the per-relay timeout adaptive; (c)
+render receipts as they stream in (progressive) rather than awaiting all relays; (d) consider a
+lighter "goal summary" path for the detail page. The honest loading indicator (00b59ce) already
+covers the UX; this is purely about wall-clock. Related: the zap-receipt-reliability hardening note
+(2026-06-05) touches the same read path — do them together.
