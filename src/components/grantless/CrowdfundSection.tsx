@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -9,14 +7,13 @@ import { useZapGoal } from '@/hooks/useZapGoal';
 import { getActiveRelays } from '@/lib/relays';
 import {
   buildZapGoalTemplate,
-  buildMockZapReceiptTemplate,
   buildTaskProposalTemplate,
   taskProposalToInput,
   formatSats,
   type TaskProposal,
 } from '@/lib/catallax';
+import { ContributeDialog } from './ContributeDialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -37,9 +34,7 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
   const { config, presetRelays } = useAppContext();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { data: zapData } = useZapGoal(task.goalId);
-  const [amount, setAmount] = useState('');
 
   if (task.fundingType !== 'crowdfunding') return null;
 
@@ -70,29 +65,6 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
       onUpdate?.();
     } catch (e) {
       fail("Couldn't open for funding", e);
-    }
-  };
-
-  const contribute = async () => {
-    const sats = parseInt(amount, 10);
-    if (!sats || sats <= 0 || !task.goalId || !task.arbiterPubkey || !user) {
-      toast({ title: 'Enter a positive amount of sats', variant: 'destructive' });
-      return;
-    }
-    try {
-      await publishEvent(
-        buildMockZapReceiptTemplate({
-          senderPubkey: user.pubkey,
-          recipient: task.arbiterPubkey,
-          amountSats: sats,
-          referencedId: task.goalId,
-        }),
-      );
-      queryClient.invalidateQueries({ queryKey: ['zap-goal', task.goalId] });
-      toast({ title: 'Contribution sent', description: `You contributed ${formatSats(String(sats))}.` });
-      setAmount('');
-    } catch (e) {
-      fail("Couldn't contribute", e);
     }
   };
 
@@ -128,23 +100,7 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
               </p>
             </div>
 
-            {user && task.status !== 'concluded' && (
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="amount in sats"
-                  className="h-8 max-w-[12rem]"
-                  aria-label="Contribution amount in sats"
-                />
-                <Button size="sm" variant="secondary" className="h-8 shrink-0" disabled={isPending} onClick={contribute}>
-                  {isPending && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-                  Contribute
-                </Button>
-              </div>
-            )}
+            {user && task.status !== 'concluded' && <ContributeDialog task={task} />}
           </div>
         )}
       </CardContent>
