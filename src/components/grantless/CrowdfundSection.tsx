@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CrowdfundSectionProps {
   task: TaskProposal;
@@ -36,7 +37,7 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
   const { config, presetRelays } = useAppContext();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
-  const { data: zapData } = useZapGoal(task.goalId);
+  const { data: zapData, isLoading: goalLoading } = useZapGoal(task.goalId);
   // Held between publishing the goal and the relays echoing back the task's goalId,
   // so the UI shows "Opening for funding…" instead of the stale "Open for funding".
   const [opening, setOpening] = useState(false);
@@ -105,17 +106,29 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
           )
         ) : (
           <div className="space-y-3">
-            <div className="space-y-1">
-              <Progress value={progress?.percentComplete ?? 0} />
-              <p className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{formatSats(String(progress?.raisedSats ?? 0))}</span>
-                {' raised of '}
-                {formatSats(String(progress?.targetSats ?? 0))}
-              </p>
-            </div>
+            {goalLoading && !progress ? (
+              <div className="space-y-1">
+                <Skeleton className="h-2.5 w-full rounded-full" />
+                <p className="flex items-center text-sm text-muted-foreground">
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  Loading funding…
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-1">
+                  <Progress value={progress?.percentComplete ?? 0} />
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{formatSats(String(progress?.raisedSats ?? 0))}</span>
+                    {' raised of '}
+                    {formatSats(String(progress?.targetSats ?? 0))}
+                  </p>
+                </div>
 
-            {progress && progress.contributors.length > 0 && (
-              <ContributorList contributors={progress.contributors} />
+                {progress && progress.contributors.length > 0 && (
+                  <ContributorList contributors={progress.contributors} />
+                )}
+              </>
             )}
 
             {user && task.status !== 'concluded' && <ContributeDialog task={task} />}
