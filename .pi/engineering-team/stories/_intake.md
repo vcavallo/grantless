@@ -280,3 +280,26 @@ analogue of the applicant `/p/:npub` page and the arbiter's track record.
 applicant/arbiter/funder tabs); privacy (zaps are public, but a "show off" page is opt-in framing);
 mock vs real-zap behavior (payments are still mocked — this page will look different against real
 LNURL receipts). Flag for a roundtable; depends on settling the real-9735 attribution path.
+
+## 2026-06-05 — Zap-receipt reliability hardening [future story]
+**Raw:** During Story 13 (real Lightning contributions) the user asked: "is it a problem that an
+arbiter may receive zaps that never move the bar? How do other Nostr crowdfund apps deal with this?"
+**Classified:** Hardening follow-on. NOT yet a story; capturing intent + the analysis.
+**The issue (real, inherent to NIP-57):** the funding bar counts kind-9735 zap receipts, which are
+published by the *recipient's LNURL server* (a third party) to the relays named in the zap request.
+The money is reliable (Lightning); the receipt is **best-effort** — it can lag, be misrouted (server
+only publishes to its own relays, ignoring the request's `relays` tag), or be dropped. This is why
+zap totals differ across Nostr clients. Story 13 already guards the *non-zap-capable* case (refuses
+when LNURL `allowsNostr` is false), so the residual risk is missing/late receipts from zap-capable
+providers — a display/accounting lag, **never lost funds** (sats reach the arbiter regardless).
+**Why it's tolerable today:** (a) custody is independent of the receipt — escrow gets the sats; (b)
+"mark funded" is a manual human decision by the arbiter/patron who can see the real balance (Story
+6.5), so the bar is an indicator, not the ledger; (c) `relay.grantless.org` is in the active set →
+in the goal's `relays` → compliant servers publish receipts where we read. (UI copy added at the
+mark-funded action 2026-06-05 to make the "bar is an estimate; you track the real accounting"
+responsibility explicit.)
+**Hardening options for the story (when we do it):** broaden `waitForReceipt` / `useZapGoal` to also
+query a few popular public relays (catch misrouted receipts); use the WebLN preimage to show the
+*contributor* a local "you paid" even if the shared bar lags; consider hosting receipt aggregation;
+tighten `waitForReceipt` to match the specific zapRequestId/bolt11 rather than any receipt referencing
+the goal (the Story-13 review's non-blocking note). Not now — money-safety already holds.

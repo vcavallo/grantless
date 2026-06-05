@@ -140,10 +140,18 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
     if (isPatron || isArbiter) {
       actions.push(
         task.arbiterPubkey ? (
-          <Button key="fund" size="sm" disabled={isPending} onClick={markFunded}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Mark funded
-          </Button>
+          <div key="fund" className="space-y-1">
+            <Button size="sm" disabled={isPending} onClick={markFunded}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Mark funded
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Contributions settle in Lightning to the arbiter as escrow. The funding bar is a{' '}
+              <strong>rough, best-effort estimate</strong> from public zap receipts — it can lag or
+              undercount. As patron/arbiter, <strong>you're responsible</strong> for tracking the real
+              sats received and marking the task funded accordingly; the bar is for display only.
+            </p>
+          </div>
         ) : (
           <p key="fund-hint" className="text-xs text-muted-foreground">Assign an arbiter before marking the task funded.</p>
         ),
