@@ -108,5 +108,5 @@ Clean:
 - Related: `src/components/grantless/CrowdfundSection.tsx` (the "N contributors" line), `calculateGoalProgress`
   (`src/lib/catallax.ts` — already aggregates contributors), `genUserName` (the placeholder source).
 - ADR: `.pi/engineering-team/decisions/0013-contributor-visibility.md`
-- Test plan: (filled in after Test Design phase)
+- Test plan: `.pi/engineering-team/stories/14-contributor-visibility.test-plan.md`
 - Review: (filled in after Review phase)
