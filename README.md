@@ -1,193 +1,107 @@
-# Catallax - Decentralized, Uncensorable Gig Work
+# Grantless
 
-A comprehensive UI implementation for testing the Catallax protocol (NIP-3400), which enables decentralized contract work on Nostr.
+**The Invisible Handout.**
 
-## ⚡ Lightning Integration
+A decentralized, crowdfunded grants program for open-source work, built on the
+[Catallax](https://catallax.network) protocol over Nostr. Open-source teams post crowdfunded
+gigs for their apps or features, the community funds them with Lightning, teams **self-assign and
+build the work themselves**, and an arbiter releases the pooled sats when it's delivered. No board,
+no application, no grantmaker — the market does what the committee used to.
 
-**Real Lightning payments are now supported!** The app includes both demo mode (simulated payments) and real Lightning integration via WebLN. Switch between modes in the Settings tab.
+The name is a nod to every dev who never got a grant from a managed fund. The mechanism is
+deliberately the *opposite* of the OpenSats playbook: instead of a foundation doing diligence and
+picking winners, community-curated **OpenSets** (Nostr lists) power discovery and trust, and funders
+steer with their sats and their social standing.
 
-## Features
+## Open, permissionless, Web-of-Trust based
 
-This implementation covers all Catallax protocol features:
+This is the most important property of the system. **No pubkey, relay, arbiter, or host holds any
+special privilege or capability.** Trust is social — derived from the Web of Trust — never granted
+by the client. Hardcoded values (the default relay, suggested curators) exist only to make first-run
+convenient; every one is documented as a default, trivially overridable, and free of elevated
+status. Anyone can clone this, point it at their own relay/curators/arbiters, and run an identical
+Grantless. See [`.pi/AGENTS.md`](.pi/AGENTS.md) for the full prime directive.
 
-### For Arbiters
-- **Create Arbiter Services** - Advertise arbitration services with fee structures and expertise areas
-- **Manage Service Announcements** - Update service details, policies, and fee structures
-- **View Assigned Tasks** - See tasks that use your arbitration services
-- **Conclude Tasks** - Document task resolutions and payment confirmations
+## The core loop
 
-### For Patrons (Task Creators)
-- **Create Task Proposals** - Post detailed work requirements with payment terms
-- **Select Arbiters** - Choose from available arbitration services
-- **Fund Tasks** - Add escrow funding via Lightning zaps
-- **Assign Workers** - Select and assign workers to funded tasks
-- **Track Progress** - Monitor task status through completion
+1. You pick a **curator** to browse — you see the applicants that curator vouches for, and their
+   projects.
+2. An applicant **posts a project** (a crowdfunding task) and assigns an **arbiter** from the
+   curator's trusted-arbiter set.
+3. The community **funds** it. Contributions are custodied by the arbiter as escrow — not by
+   Grantless and not by any central treasury.
+4. A **worker** (often the team itself) delivers the work and marks it submitted.
+5. The arbiter **concludes** it: release the pooled sats to the worker, or refund the crowd.
 
-### For Workers (Free Agents)
-- **Discover Tasks** - Browse available funded tasks
-- **Apply for Work** - Contact patrons for task assignments
-- **Submit Work** - Mark tasks as submitted for review
-- **Track Assignments** - View tasks you're working on
+Discovery and trust run on **OpenSets** — curated Nostr lists (kind `30000`/`30392`) published from
+a curator's point of view. Choosing a different curator switches whose world you see. Anyone can be
+a curator, an arbiter, or an applicant; visibility in a given instance is the *viewer's* chosen
+curation. Open by default, filterable by choice.
 
-### Discovery & Management
-- **Browse Arbiters** - View all available arbitration services with fees and specialties
-- **Task Marketplace** - Discover tasks needing funding or workers (with filters)
-- **Lightning Integration** - Native zap support for escrow funding and payments
-- **Status Tracking** - Real-time updates on task progress
-- **Payment History** - View completed task resolutions and outcomes
+## Getting started
 
-## Protocol Implementation
-
-The UI implements the complete Catallax protocol specification:
-
-- **Kind 33400**: Arbiter Announcement (parameterized replaceable)
-- **Kind 33401**: Task Proposal (parameterized replaceable)
-- **Kind 3402**: Task Conclusion (regular event)
-
-### Task Workflow
-
-1. **Arbiter Setup** - Arbiters create service announcements
-2. **Task Creation** - Patrons create proposals and select arbiters
-3. **Escrow Funding** - Patrons click "Fund Escrow" → pay Lightning invoice → task automatically updates to "funded"
-4. **Worker Assignment** - Patrons assign workers to funded tasks
-5. **Work Completion** - Workers submit completed work
-6. **Payment Resolution** - Arbiters send Lightning payments to workers or refunds to patrons
-7. **Task Conclusion** - Arbiters document final resolution with payment receipts
-
-**Seamless Experience**: The app automatically handles task status updates after Lightning payments complete.
-
-## Technical Features
-
-- **Lightning Integration** - Native zap support for all payments (escrow, worker payments, refunds)
-- **Smart Filtering** - Toggle between funded/unfunded tasks for different user roles
-- **Real-time Updates** - Live task status changes via Nostr subscriptions
-- **Efficient Querying** - Optimized relay queries with proper filtering
-- **User Management** - Multi-account support with role-based interfaces
-- **Responsive Design** - Mobile-friendly interface with dark/light themes
-- **Type Safety** - Full TypeScript implementation with proper event validation
-
-## Getting Started
-
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
-
-3. **Access the Application**
-   - Open http://localhost:5173
-   - Log in with a Nostr extension (Alby, nos2x, etc.)
-   - Start creating arbiter services or task proposals
-
-## Usage Guide
-
-### Creating an Arbiter Service
-
-1. Click "Create Arbiter Service"
-2. Fill in service details, fee structure, and expertise areas
-3. Publish to make your services available to patrons
-
-### Posting a Task
-
-1. Click "Create Task"
-2. Describe the work, requirements, and payment amount
-3. Select an arbiter from available services
-4. Fund the task via Lightning to activate it
-
-### Managing Tasks
-
-- **Patrons**: Fund tasks via Lightning, assign workers, track progress
-- **Workers**: Submit completed work, communicate with patrons
-- **Arbiters**: Send Lightning payments to workers or refunds to patrons, document resolutions
-
-### Lightning Payments
-
-The app supports both demo and real Lightning payments:
-
-#### Demo Mode (Default)
-- **Fund Escrow**: Simulated Lightning payments for protocol testing
-- **Worker Payment**: Simulated arbiter payments to workers
-- **Patron Refund**: Simulated refunds to patrons
-- **No Real Bitcoin**: Safe for testing and development
-
-#### Real Lightning Mode
-- **WebLN Integration**: Uses browser Lightning wallet extensions (Alby, Mutiny, etc.)
-- **QR Code Support**: Scan Lightning invoices with any mobile Lightning wallet
-- **LNURL-Pay Support**: Resolves Lightning addresses from user profiles
-- **NIP-57 Zaps**: Full Nostr zap implementation with receipts
-- **Real Bitcoin**: Actual Lightning payments sent over the network
-
-**Switch modes in Settings tab**
-
-### Discovery Filters
-
-- **Unfunded Tasks** (default): Shows proposed tasks needing funding - ideal for patrons
-- **Funded Tasks**: Shows funded tasks needing workers - ideal for workers
-- Toggle between views to see different opportunities
-
-## Protocol Notes
-
-- All events use the `t` tag with "catallax" for efficient discovery
-- Task updates replace previous versions (parameterized replaceable events)
-- Payment confirmations reference Lightning zap receipts
-- Out-of-band communication handles worker applications and work submission
-
-## Development
-
-Built with:
-- React 18 + TypeScript
-- TailwindCSS + shadcn/ui components
-- Nostrify for Nostr protocol integration
-- TanStack Query for data management
-- React Router for navigation
-
-## How to Use Real Lightning
-
-### Prerequisites
-1. **Lightning Wallet** (choose one):
-   - **WebLN Extension**: [Alby](https://getalby.com), [Mutiny](https://mutinywallet.com), etc.
-   - **Mobile Wallet**: Any Lightning wallet that can scan QR codes (Phoenix, Breez, Zeus, etc.)
-
-2. **Set Up Lightning Address**:
-   - Add `lud16` field to your Nostr profile (kind 0 event)
-   - Format: `"lud16": "username@domain.com"`
-   - Many Lightning wallets provide Lightning addresses
-
-### Enable Real Lightning
-1. Go to **Settings** tab in the app
-2. Toggle **"Real Lightning Payments"**
-3. Confirm you understand real Bitcoin will be sent
-4. The app will check for WebLN support
-
-### Making Payments
-1. **Fund Tasks**: Click "Fund Escrow" → Choose payment method → Task automatically becomes "funded"
-   - **WebLN**: Browser extension handles payment automatically
-   - **QR Code**: Scan with any Lightning wallet app
-2. **Pay Workers**: Arbiters click "Pay Worker" → Real Lightning payment sent
-3. **Issue Refunds**: Arbiters click "Refund Patron" → Lightning refund sent
-4. **Seamless Updates**: Task status updates automatically when payments complete
-
-### Payment Methods
-- **WebLN Tab**: One-click payments with browser extensions
-- **QR Code Tab**: Scan with mobile wallets + automatic payment detection via Nostr relays
-- **Real-time Detection**: Watches for zap receipts on Nostr to automatically confirm payments
-- **Universal Support**: Works with any Lightning wallet, not just WebLN
-
-### Lightning Address Setup Examples
-```json
-// In your Nostr profile (kind 0)
-{
-  "name": "Alice",
-  "lud16": "alice@getalby.com",
-  "lud06": "LNURL1234..." // Alternative LNURL format
-}
+```bash
+npm install
+npm run dev
 ```
 
-The app automatically detects Lightning addresses from user profiles and enables zap functionality.
+`npm run dev` spins up a local [strfry](https://github.com/hoytech/strfry) relay in Docker, seeds it
+with a fixed, browsable dataset, and starts Vite pointed at it — so you get a working Grantless world
+with zero external dependencies. Open http://localhost:5173 and log in with a Nostr extension
+(Alby, nos2x, …). Requires Docker for the local relay.
+
+## Configuration
+
+Everything is an optional, overridable convenience — see [`.env.example`](.env.example):
+
+| Env var | Purpose |
+|---|---|
+| `VITE_DEFAULT_RELAY` | Override the shipped default relay (`wss://relay.grantless.org`). |
+| `VITE_RELAY_URL` | Point the whole app at one relay (e.g. a local strfry). |
+| `VITE_GRANTLESS_CURATORS` | Seed the curator picker with specific npubs (merged with discovered curators). |
+
+The default read set also includes `wss://tags.brainstorm.world/relay`, where curators mint their
+OpenSets — none of these is privileged, and the in-app Settings let users repoint or remove any of
+them.
+
+## Testing
+
+Three levels, real events over mocks (the point of building on Nostr):
+
+```bash
+npm test                                    # tsc + eslint + unit/integration (vitest) + build
+npx playwright test                         # browser e2e against a seeded local relay
+```
+
+- **Unit/integration** (Vitest): pure helpers and the wrapper layer; relay-touching paths are
+  exercised with **real events** via a local strfry + [`nak`](https://github.com/fiatjaf/nak), never
+  mocked.
+- **E2E** (Playwright): drives the real browser against the seeded relay. On NixOS, set
+  `PLAYWRIGHT_CHROMIUM_PATH` to a working chromium.
+
+## Deploying
+
+- **App** → Vercel. The repo ships [`vercel.json`](vercel.json) (Vite + SPA rewrites); connect the
+  repo and point your domain at it. No env vars are required; defaults work.
+- **Relay** → the always-on default `wss://relay.grantless.org` is a plain strfry. See
+  [`relay/README.md`](relay/README.md) for the production config and reverse-proxy setup. (It's a
+  default, not a dependency — run your own and repoint `VITE_DEFAULT_RELAY`.)
+
+## Project layout
+
+- `src/` — the app (UI in `src/components/grantless`, shared protocol layer in `src/lib/catallax.ts`).
+- `relay/` — strfry configs for dev/test and production.
+- `test/` — the nak harness, dev seed, and Playwright specs.
+- [`NIP.md`](NIP.md) — the Catallax protocol document.
+- `.pi/` — the engineering-team harness (roles, workflows, stories, ADRs, reviews) this project is
+  built with.
+
+## Relationship to upstream
+
+Grantless is a narrowed, opinionated front-end forked from the unopinionated
+[`catallax-reference-client`](https://github.com/vcavallo/catallax-reference-client). The Catallax
+protocol layer and the wrapper around Nostr stay shared with upstream; the grants framing, OpenSets
+curation, and self-assignment flow live only here. Merges flow one way (upstream → Grantless).
 
 ---
 
