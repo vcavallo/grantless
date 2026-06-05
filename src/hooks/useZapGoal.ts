@@ -11,10 +11,13 @@ interface ZapGoalData {
   progress: GoalProgress;
 }
 
-// Direct WebSocket query to specific relays - bypasses NPool issues
+type ReceiptFilter = { kinds: number[]; '#e'?: string[]; '#a'?: string[]; limit?: number };
+
+// Direct WebSocket query to specific relays - bypasses NPool issues. Accepts multiple
+// filters so a single REQ (one round-trip) can fetch by both `#e` and `#a` at once.
 async function queryRelaysDirect(
   relays: string[],
-  filter: { kinds: number[]; '#e'?: string[]; '#a'?: string[]; limit?: number },
+  filters: ReceiptFilter[],
   timeoutMs: number = 8000
 ): Promise<NostrEvent[]> {
   const allEvents: NostrEvent[] = [];
@@ -33,7 +36,7 @@ async function queryRelaysDirect(
         }, timeoutMs);
 
         ws.onopen = () => {
-          ws.send(JSON.stringify(['REQ', subId, filter]));
+          ws.send(JSON.stringify(['REQ', subId, ...filters]));
         };
 
         ws.onmessage = (msg) => {
@@ -103,27 +106,14 @@ export function useZapGoal(goalId: string | undefined) {
       const goalRelays = goal.tags.find(([name]) => name === 'relays')?.slice(1) || [];
       const relaysToQuery = [...new Set([...activeRelays, ...goalRelays])];
 
-      // Query for zap receipts using direct WebSocket (bypasses NPool issues)
-      const receipts = await queryRelaysDirect(
-        relaysToQuery,
-        { kinds: [9735], '#e': [goalId], limit: 500 }
-      );
-
-      // Also query by #a tag if we have a linked address
+      // Fetch zap receipts in a SINGLE round-trip: one REQ carrying both the `#e`
+      // (goal id) and, when present, the `#a` (linked addressable) filter — instead
+      // of two sequential queries. Direct WebSocket (bypasses NPool issues).
+      const filters: ReceiptFilter[] = [{ kinds: [9735], '#e': [goalId], limit: 500 }];
       if (linkedAddress) {
-        const aReceipts = await queryRelaysDirect(
-          relaysToQuery,
-          { kinds: [9735], '#a': [linkedAddress], limit: 500 }
-        );
-
-        // Merge and dedupe
-        const seenIds = new Set(receipts.map(r => r.id));
-        for (const r of aReceipts) {
-          if (!seenIds.has(r.id)) {
-            receipts.push(r);
-          }
-        }
+        filters.push({ kinds: [9735], '#a': [linkedAddress], limit: 500 });
       }
+      const receipts = await queryRelaysDirect(relaysToQuery, filters);
 
       // Deduplicate receipts by event ID
       const seen = new Set<string>();
