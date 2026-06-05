@@ -76,5 +76,5 @@ not anything the client imposes.
 - Related: `src/lib/zap.ts` (`buildZapRequest`), `src/components/grantless/ContributeDialog.tsx`
   (passes the active set today), `src/hooks/useZapGoal.ts` (read side, already hardened `c5ca929`).
 - ADR: `.pi/engineering-team/decisions/0014-nip75-contribution-relays.md`
-- Test plan: (filled in after Test Design phase)
+- Test plan: `.pi/engineering-team/stories/15-nip75-contribution-relays.test-plan.md`
 - Review: (filled in after Review phase)

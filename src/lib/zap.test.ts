@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
+import type { NostrEvent } from '@nostrify/nostrify';
 import {
   lightningAddressToLnurlPayUrl,
   buildZapRequest,
   validateZapAmount,
   buildInvoiceUrl,
+  extractGoalRelays,
 } from './zap';
 
 // Unit tests for the pure NIP-57 / LNURL construction layer (Story 13 / ADR 0012).
@@ -139,5 +141,51 @@ describe('openness: no recipient or relay is special-cased', () => {
     // Same amount/goal ⇒ same amount + e tags (nothing about the parties is privileged).
     expect(tag(a.tags, 'amount')?.[1]).toBe(tag(b.tags, 'amount')?.[1]);
     expect(tag(a.tags, 'e')?.[1]).toBe(tag(b.tags, 'e')?.[1]);
+  });
+});
+
+// Story 15 / ADR 0014 — NIP-75: a contribution's zap request must advertise the goal's
+// declared relays (unioned with the viewer's active set, deduped). The pieces below are
+// the pure, testable core; the ContributeDialog wiring + real payment are manual/inspection.
+
+describe('buildZapRequest — relays are de-duplicated, order-preserving (goal relays first)', () => {
+  const req = buildZapRequest({
+    recipientPubkey: ARBITER,
+    amountSats: 100,
+    goalId: GOAL,
+    // caller passes [...goalRelays, ...activeRelays]; goalA appears in both sets
+    relays: ['wss://goal-a', 'wss://goal-b', 'wss://active-a', 'wss://goal-a'],
+  });
+
+  it('emits each relay once, preserving first-seen order (goal relays kept, not dropped)', () => {
+    expect(tag(req.tags, 'relays')).toEqual([
+      'relays',
+      'wss://goal-a',
+      'wss://goal-b',
+      'wss://active-a',
+    ]);
+  });
+
+  it('still carries the goal reference and msat amount', () => {
+    expect(tag(req.tags, 'e')?.[1]).toBe(GOAL);
+    expect(tag(req.tags, 'amount')?.[1]).toBe('100000');
+  });
+});
+
+describe('extractGoalRelays', () => {
+  function goalEvent(tags: string[][]): NostrEvent {
+    return { id: 'g', pubkey: 'p', created_at: 1, kind: 9041, content: '', tags, sig: '' };
+  }
+
+  it('returns the values of the goal\'s relays tag', () => {
+    const goal = goalEvent([
+      ['amount', '210000'],
+      ['relays', 'wss://one.example', 'wss://two.example'],
+    ]);
+    expect(extractGoalRelays(goal)).toEqual(['wss://one.example', 'wss://two.example']);
+  });
+
+  it('returns an empty array when the goal has no relays tag', () => {
+    expect(extractGoalRelays(goalEvent([['amount', '210000']]))).toEqual([]);
   });
 });
