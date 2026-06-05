@@ -108,5 +108,5 @@ Clean, and it actively avoids creating a privileged party:
 - Source intent: 2026-06-05 user request — "we never tested real lightning payments… build it first."
 - Related: `src/components/grantless/CrowdfundSection.tsx` (the mocked contribute path this replaces)
 - ADR: `.pi/engineering-team/decisions/0012-real-lightning-contributions.md`
-- Test plan: (filled in after Test Design phase)
+- Test plan: `.pi/engineering-team/stories/13-real-lightning-contributions.test-plan.md`
 - Review: (filled in after Review phase)
