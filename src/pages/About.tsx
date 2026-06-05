@@ -15,7 +15,7 @@ import {
   Network,
 } from 'lucide-react';
 
-const GITHUB_URL = 'https://github.com/vcavallo/catallax-reference-client';
+const GITHUB_URL = 'https://github.com/vcavallo/grantless';
 
 export default function About() {
   return (
@@ -152,7 +152,7 @@ export default function About() {
                 Grantless has no "approved grantees" list living in a database somewhere. Who shows
                 up is decided by
                 {' '}<a
-                  href="https://nostrhub.io/naddr1qvzqqqrcvypzpef89h53f0fsza2ugwdc3e54nfpun5nxfqclpy79r6w8nxsk5yp0qy2hwumn8ghj7un9d3shjtnyd968gmewwp6kyqqnv3jkxetww3exzmrf0fjkgttvd9ehgucxgd7rv"
+                  href="https://nostrhub.io/naddr1qvzqqqrkhqpzpf5dhatpel3a5xmk78n9cl2dnnq3daueyxec4q2l6awt23stfdveqqkhgmpdwp5kutfjv4nxzcfhxy6j6vn9veskzde3x5kkwunpde6xcetnwvkkzursd35kxctww3esyez7hp"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-4 hover:text-foreground"
