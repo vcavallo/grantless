@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { nip19 } from 'nostr-tools';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useApplicantCurationLists } from '@/hooks/useApplicantCurationLists';
 import { useNomineeProfiles } from '@/hooks/useNomineeProfiles';
@@ -84,7 +84,7 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
     return result;
   }, [configured, lists]);
 
-  const { data: curatorProfiles } = useNomineeProfiles(curators, relays);
+  const { data: curatorProfiles, isLoading: curatorProfilesLoading } = useNomineeProfiles(curators, relays);
 
   const applicants = useMemo(
     () => (selected ? applicantsForCurator(lists, selected) : []),
@@ -128,7 +128,13 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
     ? applicants.filter((a) => (filteredByPatron.get(a)?.length ?? 0) > 0)
     : applicants;
 
-  const curatorLabel = (pubkey: string) => curatorProfiles?.get(pubkey)?.name ?? genUserName(pubkey);
+  const curatorLabel = (pubkey: string) => {
+    // Honest loading: don't present a fabricated name while profiles are still
+    // resolving — the short-npub stands in until we know the real name (or that
+    // there is none). genUserName is only a post-resolution fallback.
+    if (curatorProfilesLoading && !curatorProfiles) return '';
+    return curatorProfiles?.get(pubkey)?.name ?? genUserName(pubkey);
+  };
 
   if (status === 'loading') {
     return (
@@ -187,12 +193,20 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
             <SelectContent>
               {curators.map((pubkey) => (
                 <SelectItem key={pubkey} value={pubkey}>
-                  <span className="font-medium">{curatorLabel(pubkey)}</span>
+                  {curatorLabel(pubkey) && <span className="font-medium">{curatorLabel(pubkey)}</span>}
                   <span className="ml-2 font-mono text-xs text-muted-foreground">{shortNpub(pubkey)}</span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {selected && (
+            <Link
+              to={`/c/${nip19.npubEncode(selected)}/contributors`}
+              className="inline-block text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              View contributors
+            </Link>
+          )}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <CreateProjectDialog />

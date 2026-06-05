@@ -158,6 +158,28 @@ export function applicantsForCurator(lists: CurationList[], curator: string): st
   return latest.members;
 }
 
+export interface RankedContributor {
+  pubkey: string;
+  totalSats: number;
+}
+
+/**
+ * Aggregate contributors across many goals: sum each pubkey's sats over every goal's
+ * receipts, ranked highest-first. Pure. Ranking is purely mechanical (sats only) — no
+ * pubkey is privileged; the totals reflect public zaps.
+ */
+export function aggregateContributors(progresses: GoalProgress[]): RankedContributor[] {
+  const totals = new Map<string, number>();
+  for (const progress of progresses) {
+    for (const c of progress.contributors) {
+      totals.set(c.pubkey, (totals.get(c.pubkey) ?? 0) + c.amountSats);
+    }
+  }
+  return [...totals.entries()]
+    .map(([pubkey, totalSats]) => ({ pubkey, totalSats }))
+    .sort((a, b) => b.totalSats - a.totalSats);
+}
+
 /**
  * Resolve a curator's applicant pubkeys from raw events: keep `grantless-applicants`
  * 30392s observed by `curator`, take the latest, return its members. Never filters

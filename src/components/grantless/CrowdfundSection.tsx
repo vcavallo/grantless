@@ -14,6 +14,7 @@ import {
   type TaskProposal,
 } from '@/lib/catallax';
 import { ContributeDialog } from './ContributeDialog';
+import { ContributorList } from './ContributorList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -110,10 +111,12 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
                 <span className="font-medium text-foreground">{formatSats(String(progress?.raisedSats ?? 0))}</span>
                 {' raised of '}
                 {formatSats(String(progress?.targetSats ?? 0))}
-                {' · '}
-                {progress?.contributors.length ?? 0} contributor{(progress?.contributors.length ?? 0) === 1 ? '' : 's'}
               </p>
             </div>
+
+            {progress && progress.contributors.length > 0 && (
+              <ContributorList contributors={progress.contributors} />
+            )}
 
             {user && task.status !== 'concluded' && <ContributeDialog task={task} />}
           </div>
