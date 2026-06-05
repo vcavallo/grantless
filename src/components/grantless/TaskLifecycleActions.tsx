@@ -200,19 +200,34 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
   } else if (task.status === 'submitted') {
     if (isArbiter) {
       actions.push(
-        <div key="conclude" className="flex items-center gap-2">
-          <Select value={resolution} onValueChange={(v) => setResolution(v as ResolutionType)}>
-            <SelectTrigger className="h-8 w-[10rem] text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {RESOLUTIONS.map((r) => (
-                <SelectItem key={r} value={r}>{r}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button size="sm" disabled={isPending} onClick={conclude} className="shrink-0">
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Conclude
-          </Button>
+        <div key="conclude" className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Select value={resolution} onValueChange={(v) => setResolution(v as ResolutionType)}>
+              <SelectTrigger className="h-8 w-[10rem] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {RESOLUTIONS.map((r) => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button size="sm" disabled={isPending} onClick={conclude} className="shrink-0">
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Conclude
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Concluding records the outcome on Nostr, but Grantless doesn't move the sats yet — settle the
+            payout or refund manually over Lightning. Automated Lightning payout/refund is supported by the{' '}
+            <a
+              href="https://catallax-reference-client.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Catallax reference client
+            </a>
+            .
+          </p>
         </div>,
       );
     }
