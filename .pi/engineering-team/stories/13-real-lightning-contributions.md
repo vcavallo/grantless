@@ -1,6 +1,6 @@
 # Story 13: Real Lightning contributions
 
-**Status:** Draft
+**Status:** Done
 **Created:** 2026-06-05
 **Type:** Feature
 
@@ -109,4 +109,4 @@ Clean, and it actively avoids creating a privileged party:
 - Related: `src/components/grantless/CrowdfundSection.tsx` (the mocked contribute path this replaces)
 - ADR: `.pi/engineering-team/decisions/0012-real-lightning-contributions.md`
 - Test plan: `.pi/engineering-team/stories/13-real-lightning-contributions.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/13-real-lightning-contributions.md` (PASS)
