@@ -5,8 +5,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLightningZap } from '@/hooks/useLightningZap';
+import { useZapGoal } from '@/hooks/useZapGoal';
 import { useToast } from '@/hooks/useToast';
 import { getActiveRelays } from '@/lib/relays';
+import { extractGoalRelays } from '@/lib/zap';
 import { type TaskProposal } from '@/lib/catallax';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +41,14 @@ export function ContributeDialog({ task }: { task: TaskProposal }) {
   const lightningAddress = arbiter.data?.metadata?.lud16 || arbiter.data?.metadata?.lud06;
   const arbiterResolved = !!arbiter.data || arbiter.isError;
   const hasAddress = !!lightningAddress;
+
+  // The goal's own declared relays (NIP-75): a contribution MUST be published there.
+  // Reuses the goal already fetched by the parent CrowdfundSection (same query key).
+  const { data: zapData } = useZapGoal(task.goalId);
+  const goalRelays = zapData?.goal ? extractGoalRelays(zapData.goal) : [];
+  // Advertise the goal's relays first (spec), unioned with the viewer's active set
+  // (resilience). buildZapRequest / the receipt poll de-dupe.
+  const contributionRelays = [...goalRelays, ...getActiveRelays(config, presetRelays)];
 
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
@@ -78,10 +88,9 @@ export function ContributeDialog({ task }: { task: TaskProposal }) {
     watchRef.current?.abort();
     const ac = new AbortController();
     watchRef.current = ac;
-    const relays = getActiveRelays(config, presetRelays);
     const since = Math.floor(Date.now() / 1000);
     setPhase('waiting');
-    waitForReceipt(goalId, relays, since, ac.signal).then((seen) => {
+    waitForReceipt(goalId, contributionRelays, since, ac.signal).then((seen) => {
       if (ac.signal.aborted) return;
       if (seen) {
         setPhase('done');
@@ -103,12 +112,11 @@ export function ContributeDialog({ task }: { task: TaskProposal }) {
     setPhase('preparing');
     setError('');
     try {
-      const relays = getActiveRelays(config, presetRelays);
       const { invoice: pr } = await prepareInvoice({
         recipientPubkey: task.arbiterPubkey,
         amountSats: sats,
         goalId: task.goalId,
-        relays,
+        relays: contributionRelays,
       });
       setInvoice(pr);
       startWatch(task.goalId);

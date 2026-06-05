@@ -1,4 +1,5 @@
 import { bech32 } from '@scure/base';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 // Pure NIP-57 / LNURL construction (Story 13 / ADR 0012). No network, no DOM, no
 // wallet — the unit-tested core of real Lightning contributions. The side effects
@@ -56,7 +57,9 @@ export function buildZapRequest(
     tags: [
       ['p', input.recipientPubkey],
       ['amount', String(input.amountSats * 1000)],
-      ['relays', ...input.relays],
+      // De-duplicated, order-preserving: callers pass [...goalRelays, ...activeRelays],
+      // so the goal's declared relays come first and are never dropped (NIP-75).
+      ['relays', ...new Set(input.relays)],
       ['e', input.goalId],
     ],
   };
@@ -107,4 +110,13 @@ export function buildInvoiceUrl(
   url.searchParams.set('nostr', zapRequestJson);
   if (comment) url.searchParams.set('comment', comment);
   return url.toString();
+}
+
+/**
+ * The relays a NIP-75 zap goal (kind 9041) declares in its `relays` tag — where the
+ * goal's zaps are "sent to and tallied from." A contribution MUST advertise these in
+ * its zap request (NIP-75). Returns [] when the goal has no relays tag. Pure.
+ */
+export function extractGoalRelays(goal: NostrEvent): string[] {
+  return goal.tags.find(([name]) => name === 'relays')?.slice(1) ?? [];
 }
