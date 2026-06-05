@@ -50,7 +50,7 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
-  const { candidates, isLoading } = useCuratorArbiterCandidates(curatorPubkey);
+  const { candidates, memberCount, isLoading } = useCuratorArbiterCandidates(curatorPubkey);
   const [selected, setSelected] = useState<string>(task.arbiterPubkey ?? '');
   // Held between publishing the arbiter assignment and the relays echoing the updated
   // task back, so the UI shows "Assigning…" rather than looking like nothing happened.
@@ -100,7 +100,9 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
   if (candidates.length === 0) {
     return (
       <p className="text-xs text-muted-foreground">
-        No arbiters available from this curator. Try another curator or relay.
+        {memberCount > 0
+          ? "This curator vouches for arbiter(s), but none have published an arbiter service yet — they need to “Become an Arbiter” before they can be assigned."
+          : 'This curator hasn’t vouched for any arbiters yet. Try another curator or relay.'}
       </p>
     );
   }

@@ -12,6 +12,10 @@ import {
 
 export interface CuratorArbiterCandidatesResult {
   candidates: ArbiterCandidate[];
+  /** How many arbiters the curator vouches for (list members), before the
+   *  has-announced-a-service filter — lets the UI distinguish "none vouched" from
+   *  "vouched but none have announced a service yet". */
+  memberCount: number;
   isLoading: boolean;
   relays: string[];
 }
@@ -48,5 +52,5 @@ export function useCuratorArbiterCandidates(curatorPubkey: string | undefined): 
     : [];
   const candidates = selectArbiterCandidates(members, announcements);
 
-  return { candidates, isLoading: lists.isLoading || arbitersLoading, relays };
+  return { candidates, memberCount: members.length, isLoading: lists.isLoading || arbitersLoading, relays };
 }
