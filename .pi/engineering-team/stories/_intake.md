@@ -331,9 +331,9 @@ for `{kinds:[9735],'#a':[linkedAddress]}` — each with an ~8s per-relay timeout
 relay set (now union(active, goal.relays) since c5ca929). On a slow prod relay that can stack toward
 ~16s worst case. Relay latency is inherent, but the double round-trip + fixed long timeout make it
 worse than necessary.
-**Options when we do it:** (a) collapse the `#e` + `#a` receipt queries into a SINGLE REQ (two
-filters in one round) — halves the rounds; (b) lower / make the per-relay timeout adaptive; (c)
-render receipts as they stream in (progressive) rather than awaiting all relays; (d) consider a
-lighter "goal summary" path for the detail page. The honest loading indicator (00b59ce) already
-covers the UX; this is purely about wall-clock. Related: the zap-receipt-reliability hardening note
-(2026-06-05) touches the same read path — do them together.
+**Options when we do it:** (a) ~~collapse the `#e` + `#a` receipt queries into a SINGLE REQ~~ —
+**DONE in 53525f2** (queryRelaysDirect now takes multiple filters → one round, not two);
+(b) lower / make the per-relay timeout adaptive; (c) render receipts as they stream in (progressive)
+rather than awaiting all relays; (d) consider a lighter "goal summary" path for the detail page. The
+honest loading indicator (00b59ce) covers the UX; remaining work is purely wall-clock. Related: the
+zap-receipt-reliability hardening note (2026-06-05) touches the same read path — do them together.
