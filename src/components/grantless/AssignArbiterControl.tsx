@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -52,6 +52,12 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
   const { toast } = useToast();
   const { candidates, isLoading } = useCuratorArbiterCandidates(curatorPubkey);
   const [selected, setSelected] = useState<string>(task.arbiterPubkey ?? '');
+  // Held between publishing the arbiter assignment and the relays echoing the updated
+  // task back, so the UI shows "Assigning…" rather than looking like nothing happened.
+  const [assigning, setAssigning] = useState(false);
+  useEffect(() => {
+    if (assigning && selected && task.arbiterPubkey === selected) setAssigning(false);
+  }, [assigning, selected, task.arbiterPubkey]);
 
   // Only the project's patron may set its arbiter (Catallax authorized-updater rule).
   if (!user || user.pubkey !== task.patronPubkey) return null;
@@ -64,10 +70,12 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
       arbiterPubkey: candidate.pubkey,
       arbiterService: candidate.serviceCoord,
     });
+    setAssigning(true);
     try {
       await publishEvent(template);
       toast({ title: 'Arbiter assigned', description: `${candidate.name ?? genUserName(candidate.pubkey)} is now the arbiter.` });
     } catch (error) {
+      setAssigning(false);
       toast({
         title: "Couldn't assign the arbiter",
         description: error instanceof Error ? error.message : 'Publishing failed. Please try again.',
@@ -78,6 +86,15 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
 
   if (isLoading) {
     return <p className="text-xs text-muted-foreground">Loading arbiters…</p>;
+  }
+
+  if (assigning) {
+    return (
+      <p className="flex items-center text-xs text-muted-foreground">
+        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+        Assigning arbiter… (waiting for the relays to confirm)
+      </p>
+    );
   }
 
   if (candidates.length === 0) {

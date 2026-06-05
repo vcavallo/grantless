@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -48,6 +48,13 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
   const { data: conclusions = [] } = useTaskConclusions();
   const [workerInput, setWorkerInput] = useState('');
   const [resolution, setResolution] = useState<ResolutionType>('successful');
+  // A status-changing action was published but the relays haven't echoed the new
+  // version back yet. Hold this transitional state (the status at click time) so the
+  // UI shows "Applying…" instead of the stale buttons, until the prop catches up.
+  const [applyingFrom, setApplyingFrom] = useState<string | null>(null);
+  useEffect(() => {
+    if (applyingFrom !== null && task.status !== applyingFrom) setApplyingFrom(null);
+  }, [task.status, applyingFrom]);
 
   if (!user) {
     return <p className="text-sm text-muted-foreground">Log in as this task's patron, arbiter, or worker to manage it.</p>;
@@ -62,14 +69,17 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
     toast({ title });
     onUpdate?.();
   };
-  const fail = (title: string, error: unknown) =>
+  const fail = (title: string, error: unknown) => {
+    setApplyingFrom(null);
     toast({
       title,
       description: error instanceof Error ? error.message : 'Publishing failed. Please try again.',
       variant: 'destructive',
     });
+  };
 
   const markFunded = async () => {
+    setApplyingFrom(task.status);
     try {
       await publishEvent(markTaskStatus(task, 'funded'));
       ok('Task marked funded');
@@ -84,6 +94,7 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
       toast({ title: 'Invalid worker', description: 'Enter an npub or hex pubkey, or leave blank to assign yourself.', variant: 'destructive' });
       return;
     }
+    setApplyingFrom(task.status);
     try {
       await publishEvent(assignWorker(task, target));
       ok(target === user.pubkey ? 'You are now the worker' : 'Worker assigned');
@@ -93,6 +104,7 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
   };
 
   const markSubmitted = async () => {
+    setApplyingFrom(task.status);
     try {
       await publishEvent(markTaskStatus(task, 'submitted'));
       ok('Work submitted');
@@ -103,6 +115,7 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
 
   const conclude = async () => {
     const recipient = resolution === 'successful' ? task.workerPubkey ?? task.patronPubkey : task.patronPubkey;
+    setApplyingFrom(task.status);
     try {
       const receipt = await publishEvent(
         buildMockZapReceiptTemplate({
@@ -211,7 +224,12 @@ export function TaskLifecycleActions({ task, curatorPubkey, onUpdate }: TaskLife
     <Card>
       <CardContent className="space-y-3 p-4">
         <p className="font-medium">Task actions</p>
-        {task.status === 'concluded' ? (
+        {applyingFrom !== null ? (
+          <p className="flex items-center text-sm text-muted-foreground">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Applying your change… (waiting for the relays to confirm)
+          </p>
+        ) : task.status === 'concluded' ? (
           <p className="text-sm text-muted-foreground">
             This task has concluded{conclusion ? ` — ${conclusion.resolution}` : ''}.
           </p>

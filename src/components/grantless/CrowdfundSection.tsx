@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -35,21 +36,30 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
   const { data: zapData } = useZapGoal(task.goalId);
+  // Held between publishing the goal and the relays echoing back the task's goalId,
+  // so the UI shows "Opening for funding…" instead of the stale "Open for funding".
+  const [opening, setOpening] = useState(false);
+  useEffect(() => {
+    if (opening && task.goalId) setOpening(false);
+  }, [opening, task.goalId]);
 
   if (task.fundingType !== 'crowdfunding') return null;
 
   const isPatron = user?.pubkey === task.patronPubkey;
   const progress = zapData?.progress;
 
-  const fail = (title: string, error: unknown) =>
+  const fail = (title: string, error: unknown) => {
+    setOpening(false);
     toast({
       title,
       description: error instanceof Error ? error.message : 'Publishing failed. Please try again.',
       variant: 'destructive',
     });
+  };
 
   const openForFunding = async () => {
     if (!task.arbiterPubkey) return;
+    setOpening(true);
     const relays = getActiveRelays(config, presetRelays);
     try {
       const goal = await publishEvent(
@@ -77,7 +87,12 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
         </div>
 
         {!task.goalId ? (
-          isPatron && task.arbiterPubkey && task.status === 'proposed' ? (
+          opening ? (
+            <p className="flex items-center text-sm text-muted-foreground">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Opening for funding… (waiting for the relays to confirm)
+            </p>
+          ) : isPatron && task.arbiterPubkey && task.status === 'proposed' ? (
             <Button size="sm" disabled={isPending} onClick={openForFunding}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Open for funding
