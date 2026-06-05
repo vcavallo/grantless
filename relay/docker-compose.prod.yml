@@ -1,0 +1,21 @@
+# Production strfry for wss://relay.grantless.org — the always-on default relay.
+# NOT privileged: it's a plain, overridable default (Grantless prime directive). A
+# forker can run their own and repoint VITE_DEFAULT_RELAY at it identically.
+#
+# Stand up:  docker compose -f relay/docker-compose.prod.yml up -d
+# Then put a TLS reverse proxy (Caddy/nginx) in front, terminating
+# wss://relay.grantless.org → http://127.0.0.1:7777. See relay/README.md.
+services:
+  strfry:
+    image: dockurr/strfry
+    container_name: grantless-strfry-prod
+    restart: unless-stopped
+    ports:
+      # Bind to localhost only; the reverse proxy handles TLS + public exposure.
+      - "127.0.0.1:7777:7777"
+    volumes:
+      - ./strfry.prod.conf:/etc/strfry.conf:ro
+      - strfry-db:/app/strfry-db
+
+volumes:
+  strfry-db:

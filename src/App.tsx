@@ -24,20 +24,26 @@ const queryClient = new QueryClient({
   },
 });
 
-// Optional dev convenience: point the app at one relay via VITE_RELAY_URL
-// (e.g. the local strfry seeded by `npm run seed`). Unset by default → the normal
-// default relay below is used and behavior is unchanged. No relay is privileged;
-// this is a plain, overridable bootstrapping default (Grantless prime directive).
+// The default relay is a plain, overridable bootstrapping convenience — no relay is
+// privileged (Grantless prime directive). Two env overrides, both optional:
+//   VITE_RELAY_URL     — point the WHOLE app at one relay (e.g. a local strfry for dev).
+//   VITE_DEFAULT_RELAY — swap the default relay a forker ships, without code edits.
+// A forker who repoints these (or edits the presets) gets an identically working app.
+const defaultRelay: string = import.meta.env.VITE_DEFAULT_RELAY?.trim() || 'wss://relay.grantless.org';
 const envRelay: string | undefined = import.meta.env.VITE_RELAY_URL?.trim() || undefined;
 
 const defaultConfig: AppConfig = envRelay
   ? { theme: "light", relayUrl: envRelay, relayMode: "custom", customRelay: envRelay }
-  : { theme: "light", relayUrl: "wss://relay.primal.net", relayMode: "default" };
+  : { theme: "light", relayUrl: defaultRelay, relayMode: "default" };
 
+// Default read set (used in "default" relay mode). Grantless Catallax events live on
+// relay.grantless.org; curation lists (kind 30392) are minted on Brainstorm, so its
+// tags relay is included so freshly-minted lists resolve. All are overridable in
+// Settings and none is privileged — repoint or remove any of them and the app still works.
 const presetRelays = [
-  { url: 'wss://ditto.pub/relay', name: 'Ditto' },
+  { url: defaultRelay, name: 'Grantless' },
+  { url: 'wss://tags.brainstorm.world/relay', name: 'Brainstorm tags' },
   { url: 'wss://relay.nostr.band', name: 'Nostr.Band' },
-  { url: 'wss://relay.damus.io', name: 'Damus' },
   { url: 'wss://relay.primal.net', name: 'Primal' },
 ];
 
