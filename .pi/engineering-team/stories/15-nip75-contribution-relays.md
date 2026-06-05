@@ -1,6 +1,6 @@
 # Story 15: NIP-75 contribution relays (zap the goal's relays)
 
-**Status:** Draft
+**Status:** Done
 **Created:** 2026-06-05
 **Type:** Bug
 
@@ -77,4 +77,4 @@ not anything the client imposes.
   (passes the active set today), `src/hooks/useZapGoal.ts` (read side, already hardened `c5ca929`).
 - ADR: `.pi/engineering-team/decisions/0014-nip75-contribution-relays.md`
 - Test plan: `.pi/engineering-team/stories/15-nip75-contribution-relays.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/15-nip75-contribution-relays.md` (PASS)
