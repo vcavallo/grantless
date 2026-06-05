@@ -75,6 +75,6 @@ not anything the client imposes.
 - Spec: NIP-75 (kind 9041); related NIP-57 (9734 zap request / 9735 receipt).
 - Related: `src/lib/zap.ts` (`buildZapRequest`), `src/components/grantless/ContributeDialog.tsx`
   (passes the active set today), `src/hooks/useZapGoal.ts` (read side, already hardened `c5ca929`).
-- ADR: (filled in after Architecture phase)
+- ADR: `.pi/engineering-team/decisions/0014-nip75-contribution-relays.md`
 - Test plan: (filled in after Test Design phase)
 - Review: (filled in after Review phase)
