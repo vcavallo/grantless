@@ -1,6 +1,6 @@
 # Story 14: Contributor visibility + honest profile loading
 
-**Status:** Draft
+**Status:** Done
 **Created:** 2026-06-05
 **Type:** Feature
 
@@ -109,4 +109,4 @@ Clean:
   (`src/lib/catallax.ts` — already aggregates contributors), `genUserName` (the placeholder source).
 - ADR: `.pi/engineering-team/decisions/0013-contributor-visibility.md`
 - Test plan: `.pi/engineering-team/stories/14-contributor-visibility.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/14-contributor-visibility.md` (PASS)
