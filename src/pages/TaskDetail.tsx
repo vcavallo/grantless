@@ -336,6 +336,24 @@ export function TaskDetail() {
               </p>
             </div>
 
+            {/* Details URL (the proposal's `r` tag). Only render as a link for
+                http(s) — the proposal comes off a relay, so guard against a
+                malicious `javascript:`/`data:` scheme becoming clickable. */}
+            {task.detailsUrl && /^https?:\/\//i.test(task.detailsUrl) && (
+              <div>
+                <h3 className="font-medium mb-2">Project link</h3>
+                <a
+                  href={task.detailsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-primary underline underline-offset-4 break-all hover:text-primary/80"
+                >
+                  <ExternalLink className="h-4 w-4 shrink-0" />
+                  {task.detailsUrl}
+                </a>
+              </div>
+            )}
+
             {/* Task Info Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card>
