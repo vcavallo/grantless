@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CATALLAX_KINDS, getStatusColor, formatSats, type GoalProgress, type TaskProposal } from '@/lib/catallax';
@@ -9,7 +9,7 @@ import { CATALLAX_KINDS, getStatusColor, formatSats, type GoalProgress, type Tas
 /** Shows the assigned arbiter, surfacing the proposer-is-arbiter relationship. */
 function ArbiterLine({ arbiterPubkey, isProposer }: { arbiterPubkey: string; isProposer: boolean }) {
   const author = useAuthor(arbiterPubkey);
-  const name = author.data?.metadata?.name ?? genUserName(arbiterPubkey);
+  const name = author.data?.metadata?.name ?? shortNpub(arbiterPubkey);
   return (
     <p className="text-xs text-muted-foreground">
       Arbiter: <span className="font-medium text-foreground">{name}</span>

@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/useToast';
 import { useCuratorArbiterCandidates } from '@/hooks/useCuratorArbiterCandidates';
 import { useAuthor } from '@/hooks/useAuthor';
 import { buildTaskProposalTemplate, taskProposalToInput, type TaskProposal } from '@/lib/catallax';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -23,7 +23,7 @@ import {
  */
 function CandidateLabel({ pubkey, serviceName }: { pubkey: string; serviceName?: string }) {
   const author = useAuthor(pubkey);
-  const name = author.data?.metadata?.name ?? genUserName(pubkey);
+  const name = author.data?.metadata?.name ?? shortNpub(pubkey);
   return (
     <span>
       {name}
@@ -73,7 +73,7 @@ export function AssignArbiterControl({ task, curatorPubkey }: AssignArbiterContr
     setAssigning(true);
     try {
       await publishEvent(template);
-      toast({ title: 'Arbiter assigned', description: `${candidate.name ?? genUserName(candidate.pubkey)} is now the arbiter.` });
+      toast({ title: 'Arbiter assigned', description: `${candidate.name ?? shortNpub(candidate.pubkey)} is now the arbiter.` });
     } catch (error) {
       setAssigning(false);
       toast({

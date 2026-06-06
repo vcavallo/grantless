@@ -1,7 +1,7 @@
 import type { NostrMetadata } from '@nostrify/nostrify';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { NomineeProjectItem } from './NomineeProjectItem';
@@ -26,9 +26,12 @@ const PREVIEW_COUNT = 3;
  * prolific applicant never overruns the browse grid.
  */
 export function NomineeCard({ pubkey, tasks, metadata, progressByGoal }: NomineeCardProps) {
-  const displayName = metadata?.name ?? genUserName(pubkey);
+  const name = metadata?.name;
+  const displayName = name ?? shortNpub(pubkey);
   const image = metadata?.picture;
-  const initial = displayName.slice(0, 2).toUpperCase();
+  // Avatar initial: from the real name when we have one, otherwise the npub's
+  // data (never a fabricated word) so the fallback reads as an identifier.
+  const initial = (name ?? shortNpub(pubkey).slice(5)).slice(0, 2).toUpperCase();
   const applicantPath = `/p/${nip19.npubEncode(pubkey)}`;
 
   const preview = tasks.slice(0, PREVIEW_COUNT);

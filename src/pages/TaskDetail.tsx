@@ -15,7 +15,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { TaskLifecycleActions } from '@/components/grantless/TaskLifecycleActions';
 import { CATALLAX_KINDS, latestAuthoritativeTask, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
 import { useCatallaxInvalidation } from '@/hooks/useCatallax';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { RelaySelector } from '@/components/RelaySelector';
 import { CopyNpubButton } from '@/components/CopyNpubButton';
 import { CrowdfundSection } from '@/components/grantless/CrowdfundSection';
@@ -370,7 +370,7 @@ export function TaskDetail() {
                   </div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-mono">
-                      {patronAuthor.data?.metadata?.name || genUserName(task.patronPubkey)}
+                      {patronAuthor.data?.metadata?.name || shortNpub(task.patronPubkey)}
                     </p>
                     <CopyNpubButton pubkey={task.patronPubkey} size="sm" className="h-6 w-6 p-0" />
                   </div>
@@ -386,7 +386,7 @@ export function TaskDetail() {
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-mono">
-                        {arbiterAuthor.data?.metadata?.name || genUserName(task.arbiterPubkey)}
+                        {arbiterAuthor.data?.metadata?.name || shortNpub(task.arbiterPubkey)}
                       </p>
                       <CopyNpubButton pubkey={task.arbiterPubkey} size="sm" className="h-6 w-6 p-0" />
                     </div>
@@ -403,7 +403,7 @@ export function TaskDetail() {
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-mono">
-                        {workerAuthor.data?.metadata?.name || genUserName(task.workerPubkey)}
+                        {workerAuthor.data?.metadata?.name || shortNpub(task.workerPubkey)}
                       </p>
                       <CopyNpubButton pubkey={task.workerPubkey} size="sm" className="h-6 w-6 p-0" />
                     </div>

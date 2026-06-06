@@ -18,7 +18,7 @@ import {
   sortTasks,
 } from '@/lib/grantless';
 import type { TaskProposal } from '@/lib/catallax';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { NomineeGrid } from './NomineeGrid';
 import { BrowseControls, type BrowseControlsState } from './BrowseControls';
 import { CreateProjectDialog } from './CreateProjectDialog';
@@ -36,15 +36,6 @@ import {
 } from '@/components/ui/select';
 
 const STORAGE_KEY = 'grantless:lastCurator';
-
-function shortNpub(pubkey: string): string {
-  try {
-    const npub = nip19.npubEncode(pubkey);
-    return `${npub.slice(0, 12)}…${npub.slice(-6)}`;
-  } catch {
-    return pubkey.slice(0, 12);
-  }
-}
 
 /**
  * Browse a curator's vouched-for applicants: discover curators, pick one (or deep-link
@@ -144,11 +135,11 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
     : applicants;
 
   const curatorLabel = (pubkey: string) => {
-    // Honest loading: don't present a fabricated name while profiles are still
-    // resolving — the short-npub stands in until we know the real name (or that
-    // there is none). genUserName is only a post-resolution fallback.
+    // Real kind-0 name only. Returns '' while profiles resolve and when a curator
+    // has no name — the dropdown always renders the short-npub beside the label, so
+    // the npub stands alone rather than pairing with a fabricated placeholder word.
     if (curatorProfilesLoading && !curatorProfiles) return '';
-    return curatorProfiles?.get(pubkey)?.name ?? genUserName(pubkey);
+    return curatorProfiles?.get(pubkey)?.name ?? '';
   };
 
   if (status === 'loading') {
@@ -239,7 +230,7 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
         <Card className="border-dashed">
           <CardContent className="space-y-6 px-8 py-12 text-center">
             <p className="text-muted-foreground">
-              {curatorLabel(selected)} hasn't listed any applicants yet. Try another curator or relay?
+              {curatorLabel(selected) || shortNpub(selected)} hasn't listed any applicants yet. Try another curator or relay?
             </p>
             <RelaySelector className="mx-auto w-full max-w-sm" />
           </CardContent>

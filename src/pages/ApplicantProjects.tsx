@@ -6,7 +6,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useTaskProposals } from '@/hooks/useCatallax';
 import { useGoalsProgress } from '@/hooks/useGoalsProgress';
 import { filterTasks, groupTasksByPatron, parsePubkey, sortTasks } from '@/lib/grantless';
-import { genUserName } from '@/lib/genUserName';
+import { shortNpub } from '@/lib/shortNpub';
 import { NomineeProjectItem } from '@/components/grantless/NomineeProjectItem';
 import { BrowseControls, type BrowseControlsState } from '@/components/grantless/BrowseControls';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,8 +25,9 @@ export default function ApplicantProjects() {
 
   const author = useAuthor(pubkey ?? '');
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? (pubkey ? genUserName(pubkey) : 'Applicant');
-  const initial = displayName.slice(0, 2).toUpperCase();
+  const name = metadata?.name;
+  const displayName = name ?? (pubkey ? shortNpub(pubkey) : 'Applicant');
+  const initial = (name ?? (pubkey ? shortNpub(pubkey).slice(5) : 'A')).slice(0, 2).toUpperCase();
 
   const { data: allTasks = [], isLoading } = useTaskProposals();
   const tasks = useMemo(() => {
