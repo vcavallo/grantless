@@ -337,3 +337,28 @@ worse than necessary.
 rather than awaiting all relays; (d) consider a lighter "goal summary" path for the detail page. The
 honest loading indicator (00b59ce) covers the UX; remaining work is purely wall-clock. Related: the
 zap-receipt-reliability hardening note (2026-06-05) touches the same read path — do them together.
+
+## 2026-06-05 — UX fixes batch: payout note + profile relays + npub fallback
+**Raw:** (a) payout/refund should stay manual for now — add a message that the Catallax reference
+client (catallax-reference-client.netlify.app) supports automated Lightning payout/refund but
+Grantless doesn't yet; (b) "Wise Owl" placeholder name persists in the applicants list; (c) the
+fabricated placeholder name should NEVER appear — show a short npub instead, even briefly while
+loading.
+**Classified:** Three Implementer-level fixes (small-UI precedent — no full phase path). Commits
+a4a8630, 2ba7630, eb214da.
+**Fixes:**
+- **Payout note** (a4a8630): muted note under the arbiter Conclude action — concluding records the
+  outcome on Nostr but doesn't move sats; settle manually over Lightning; links the reference client.
+- **Profile relays** (2ba7630): `CuratorBrowser` queried curator/applicant kind-0 only from the
+  curation-list relays (Brainstorm / relay.grantless.org); a person's profile usually lives on their
+  own relays, so on prod names never resolved → the placeholder stuck permanently. Now queries
+  `union(getActiveRelays(config, presetRelays), listRelays)` (same blessed pattern as `useZapGoal`);
+  no hardcoded relay fallback. Can't reproduce on the single-relay local seed (seed publishes every
+  profile to the one relay) — **verify on prod**.
+- **npub fallback** (eb214da): new shared `src/lib/shortNpub.ts`; replaced every `genUserName`
+  placeholder on the Grantless surfaces (NomineeCard, ApplicantProjects, NomineeProjectItem,
+  AssignArbiterControl, TaskDetail, CuratorBrowser) with a truncated npub. `genUserName` kept for the
+  non-Grantless components (AuthorName/AuthorAvatar/NoteContent/AccountSwitcher) — open question
+  whether to purge it there too.
+**Review:** `reviews/16-grantless-ux-fixes.md` — **PASS** (all four gates clean; strengthens the
+prime directive via broader user-overridable relay reads). Non-blocking notes only.
