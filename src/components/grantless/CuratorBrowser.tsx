@@ -6,6 +6,8 @@ import { useApplicantCurationLists } from '@/hooks/useApplicantCurationLists';
 import { useNomineeProfiles } from '@/hooks/useNomineeProfiles';
 import { useTaskProposals } from '@/hooks/useCatallax';
 import { useGoalsProgress } from '@/hooks/useGoalsProgress';
+import { useAppContext } from '@/hooks/useAppContext';
+import { getActiveRelays } from '@/lib/relays';
 import {
   applicantsForCurator,
   distinctCurators,
@@ -54,6 +56,19 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
   const [searchParams] = useSearchParams();
   const autoOpenArbiter = searchParams.get('compose') === 'arbiter';
   const { lists, status, relays } = useApplicantCurationLists();
+  const { config, presetRelays } = useAppContext();
+
+  // Resolve profiles from the active relay set ∪ the relays where the curation
+  // lists were found. The curation-list relays (Brainstorm, relay.grantless.org)
+  // are only a hint — a curator's or applicant's kind-0 profile usually lives on
+  // their own relays, not where their listing was published — so querying the
+  // list relays alone leaves real profiles unresolved and falls back to a
+  // fabricated "Wise Owl" name. The active set is the reliable, overridable read
+  // path (same union approach as useZapGoal); no hardcoded relay fallback.
+  const profileRelays = useMemo(
+    () => [...new Set([...getActiveRelays(config, presetRelays), ...relays])],
+    [config, presetRelays, relays],
+  );
   const [savedCurator, setSavedCurator] = useLocalStorage<string>(STORAGE_KEY, '');
 
   // A curator in the URL (e.g. /c/:npub) wins over the remembered one; remember it too.
@@ -84,7 +99,7 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
     return result;
   }, [configured, lists]);
 
-  const { data: curatorProfiles, isLoading: curatorProfilesLoading } = useNomineeProfiles(curators, relays);
+  const { data: curatorProfiles, isLoading: curatorProfilesLoading } = useNomineeProfiles(curators, profileRelays);
 
   const applicants = useMemo(
     () => (selected ? applicantsForCurator(lists, selected) : []),
@@ -93,7 +108,7 @@ export function CuratorBrowser({ curatorNpub }: { curatorNpub?: string }) {
 
   const { data: tasks = [] } = useTaskProposals();
   const tasksByPatron = useMemo(() => groupTasksByPatron(tasks), [tasks]);
-  const { data: applicantProfiles } = useNomineeProfiles(applicants, relays);
+  const { data: applicantProfiles } = useNomineeProfiles(applicants, profileRelays);
 
   // Batch-fetch funding for every goal'd project of the selected curator's applicants.
   const goalIds = useMemo(() => {
