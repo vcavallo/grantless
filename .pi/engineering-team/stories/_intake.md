@@ -362,3 +362,54 @@ a4a8630, 2ba7630, eb214da.
   whether to purge it there too.
 **Review:** `reviews/16-grantless-ux-fixes.md` — **PASS** (all four gates clean; strengthens the
 prime directive via broader user-overridable relay reads). Non-blocking notes only.
+
+## 2026-06-06 — Diagnosis (no fix): Firefox "No curators found" was a wedged WS session
+**Raw:** On one Firefox window, "No curators found on this relay" with default relays selected;
+worked on all Chromium browsers (Brave/Chrome/Vanadium) on the same site + network.
+**Diagnosed (NOT a Grantless bug):** Firefox console showed "can't establish a connection" to **all
+four** relays (grantless.org, brainstorm, nostr.band, primal), not one. Same deploy worked in 3
+Chromium browsers; relays were up + certs valid (verified via curl/nak); Brainstorm reachable,
+HTTP/1.1 + permissive CORS; no server CSP header (only the wss-allowing meta). Root cause: Firefox's
+socket/necko layer got **wedged for that window's lifetime** (typical after sleep/wake, a network
+change, or a long-lived window) — closing all old FF windows + opening a new one fixed it instantly.
+Chromium recovers from wake/network-change more aggressively. **Nothing shippable for the connection**
+(the browser refused to open any socket before our JS ran).
+**Spawned a real follow-up (small UX fix, not yet done):** when **every** relay is unreachable the
+app shows the misleading "No curators found on this relay. Try another relay?" (implies the relay is
+empty; switching relays won't help). Distinguish "couldn't reach any relay" from "connected but
+empty" and show an accurate message (extensions/AV/sleep-wake/WebSocket-blocked). Hard part: NPool's
+`nostr.query` returns `[]` for both cases — need to surface per-relay connection failure (relay
+status) to tell them apart. Parked.
+
+## 2026-06-06 — Relay ops: negentropy-mirror curation lists Brainstorm → relay.grantless.org [PARKED — write-up]
+**Raw:** "What do we have to do to turn on negentropy syncing from wss://tags.brainstorm.world/relay
+to wss://relay.grantless.org? I want to constantly pull down _relevant_ tagging events." → User: put
+on hold, write it up; other fixes first.
+**Classified:** Relay-ops chore (strfry on the prod box), NOT app code. Fixes the genuine SPOF: curator
+discovery dies if Brainstorm is truly down (lists live ONLY on Brainstorm — 23×kind-30392;
+relay.grantless.org + Primal have 0). The README already earmarked this ("Later: mirror real curation
+data (negentropy)"); negentropy IS enabled in `strfry.prod.conf` (`negentropy = 2`).
+**Plan (ready to execute):**
+- **Filter = `{"kinds":[30392]}`** — can't go narrower: Grantless keys on `observer` / `source-tag`,
+  which are MULTI-letter tags → unfilterable in a Nostr filter (only single-letter tags are indexed).
+  Volume is tiny so kind-only is fine + future-proof. (Narrowing to the grantless slugs would need a
+  strfry `writePolicy` plugin inspecting `source-tag[3]` — not worth it at this volume.)
+- **One-shot negentropy pull (download-only):**
+  `docker exec grantless-strfry-prod strfry sync wss://tags.brainstorm.world/relay --filter '{"kinds":[30392]}' --dir down`
+- **⚠️ Caveat:** Brainstorm is `strfry+nip50-proxy` (NIP-11 advertises only NIP-50) reached at `/relay`;
+  the search proxy may NOT pass NIP-77 (`NEG-OPEN`) through. Test the sync; if it errors/hangs, use the
+  **proxy-safe fallback (no negentropy):**
+  `nak req -k 30392 wss://tags.brainstorm.world/relay > /tmp/lists.jsonl` then
+  `docker exec -i grantless-strfry-prod strfry import < /tmp/lists.jsonl`.
+- **Constant:** (A, recommended) cron every ~5 min running the sync OR the nak|import form — both cheap
+  at this volume, proxy-safe. (B) `strfry router` config (`dir="down"`, `urls=[brainstorm]`,
+  `filter={kinds:[30392]}`) as a 2nd compose service for real-time streaming — needs the one-shot
+  backfill first + a low-freq cron to cover reconnect gaps.
+- **No app change needed:** relay.grantless.org is already preset #1 in the default read set, so once
+  mirrored the app resolves curators during a Brainstorm outage.
+- **Prime-directive OK:** `--dir down` only (never write to Brainstorm); mirroring public events grants
+  no privilege, stays forkable. NOTE this refines the earlier "list events don't go on grantless.org"
+  stance — that was the APP's write/broadcast policy; this is a relay-side READ mirror for resilience.
+**When executed, land in repo:** rewrite the README "Later" stub with the real procedure + proxy
+caveat; add `relay/router.conf` (+ optional compose service) and a `relay/sync-curation.sh` cron helper;
+then `/review-changes`.
