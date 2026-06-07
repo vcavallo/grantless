@@ -1,6 +1,6 @@
 # Story 16: Operator helper panel — stuck-project diagnostics
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-06
 **Type:** Feature
 
@@ -103,4 +103,4 @@ deliberately to stay compliant:
 ## Linked artifacts
 - ADR: `.pi/engineering-team/decisions/0015-operator-helper-panel.md`
 - Test plan: `.pi/engineering-team/stories/16-operator-helper-panel.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/16-operator-helper-panel.md` — **PASS**
