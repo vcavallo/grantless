@@ -413,3 +413,36 @@ data (negentropy)"); negentropy IS enabled in `strfry.prod.conf` (`negentropy = 
 **When executed, land in repo:** rewrite the README "Later" stub with the real procedure + proxy
 caveat; add `relay/router.conf` (+ optional compose service) and a `relay/sync-curation.sh` cron helper;
 then `/review-changes`.
+
+## 2026-06-07 — Story 16 done: operator helper panel (admin) shipped + verified on prod
+**Raw:** Operator-only `/admin` panel surfacing stuck projects (unvouched by any curator; no arbiter).
+**Status:** DONE — story 16 / ADR 0015 / review 16 (PASS). Verified working on prod by the user
+(operator npub set in Vercel via `VITE_GRANTLESS_OPERATOR`). Local test: set that env to a seed npub
+(Frank), `npm run dev`, log in as that account. Non-blocking follow-ups from the review (parked):
+(a) when curator lists fail to load the panel over-flags everything as "unvouched" — consider an
+"couldn't load curator lists" caveat; (b) the Playwright/seed-e2e rings for this story were never run
+in-env (NixOS/no chromium) — owe a real `npm run test:browser`.
+
+## 2026-06-07 — Project-link social-share previews [PARKED — decided NOT to build now]
+**Raw:** "Sharing a project link shows the generic landing-page preview — a bummer. Feasible to add
+per-project OG tags? If complicated, skip; document the options." → User: don't build now, document it.
+**Classified:** Enhancement, parked. NOT a story.
+**The problem:** `TaskDetail` already sets per-project og:title/og:description via Helmet, but that runs
+CLIENT-SIDE after the relay fetch. Social scrapers don't run JS — they read static `index.html` (the
+generic Grantless OG tags added in 1a3e1f8). So per-project previews need SERVER-SIDE rendering of the
+tags. Today the deploy is a pure static SPA on Vercel (`vercel.json` rewrites all → index.html; no
+serverless functions).
+**Options (from the analysis):**
+- **A (recommended if/when we do it):** a Vercel Node serverless function for `/task/*` that fetches the
+  33401 from the default relay set server-side, clones index.html, swaps the OG/Twitter block with the
+  project's title/amount/description, returns it (SPA still boots for humans). Extract the existing
+  `generateMetaDescription` logic into `lib/` so client Helmet + server share one source of truth.
+  Must use a short timeout + FALL BACK to generic tags on miss/slow relay; cache via `s-maxage`.
+- **B:** A + dynamic OG image via `@vercel/og` (branded card: title/sats/status). Defer.
+- **C:** Prerender service (UA-sniff bots → headless snapshot). Rejected — external dep, cost, against
+  the forkable/self-host ethos.
+- **D:** Do nothing (current). "Copy link" works; previews stay generic.
+**Tradeoff that made us hold:** Option A introduces the FIRST server component (no longer pure static)
+and makes rich previews Vercel-specific (forkers on plain static hosting degrade gracefully to generic
+previews — document as a progressive enhancement; prime-directive-fine: reads public events from the
+overridable relay set, no privilege). `/plan-feature` candidate when revisited.
