@@ -59,6 +59,7 @@ Everything is an optional, overridable convenience — see [`.env.example`](.env
 | `VITE_DEFAULT_RELAY` | Override the shipped default relay (`wss://relay.grantless.org`). |
 | `VITE_RELAY_URL` | Point the whole app at one relay (e.g. a local strfry). |
 | `VITE_GRANTLESS_CURATORS` | Seed the curator picker with specific npubs (merged with discovered curators). |
+| `VITE_GRANTLESS_OPERATOR` | npub(s) that see a read-only operator helper panel at `/admin`. Unset → hidden for everyone. No privilege — just convenience queries. |
 
 The default read set also includes `wss://tags.brainstorm.world/relay`, where curators mint their
 OpenSets — none of these is privileged, and the in-app Settings let users repoint or remove any of

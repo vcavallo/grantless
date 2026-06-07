@@ -21,7 +21,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run relay:down && npm run relay:up && npm run seed && VITE_RELAY_URL=ws://127.0.0.1:7787 vite --port 8123 --strictPort',
+    // VITE_GRANTLESS_OPERATOR is set to a seeded account (Frank / ROSTER.funders[0])
+    // so operator-panel.spec.ts can log in as the operator. It's an ordinary key —
+    // nothing privileged — proving the panel is gated purely by configured pubkey.
+    command: 'npm run relay:down && npm run relay:up && npm run seed && VITE_RELAY_URL=ws://127.0.0.1:7787 VITE_GRANTLESS_OPERATOR=npub18yce33sv4tlgqy53js2s2u8pradnkhkmrpmp0x4x2tvg247p4dzq5m2c5f vite --port 8123 --strictPort',
     url: 'http://127.0.0.1:8123',
     reuseExistingServer: true,
     timeout: 120_000,

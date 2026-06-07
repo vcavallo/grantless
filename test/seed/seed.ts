@@ -42,7 +42,8 @@ interface ProjectSpec {
   d: string;
   title: string;
   patron: SeedAccount;
-  arbiter: SeedAccount;
+  /** Arbiter (escrow holder). Optional — omit to seed an arbiter-less project. */
+  arbiter?: SeedAccount;
   /** Worker for in_progress+; may equal the patron (self-assignment). */
   worker?: SeedAccount;
   target: Status;
@@ -78,13 +79,20 @@ function projectSpecs(): ProjectSpec[] {
     { d: 'seed-inprogress-alice', title: 'Offline-first sync for notes', patron: alice, arbiter: erin, worker: carol, target: 'in_progress', amount: '120000' },
     { d: 'seed-submitted-bob-self', title: 'Self-hosted relay quickstart guide', patron: bob, arbiter: dave, worker: bob, target: 'submitted', amount: '60000' },
     { d: 'seed-concluded-alice', title: 'NIP-44 encryption migration', patron: alice, arbiter: dave, worker: carol, target: 'concluded', amount: '100000' },
+    // Operator-panel (Story 16) stuck cases. Authored by Carol the worker — who is
+    // in NO curator's applicant set — so these never surface in any curator browse
+    // (zero impact on browse specs), only in the operator helper panel:
+    //   • unvouched but HAS an arbiter → "not vouched by any curator" only;
+    //   • no arbiter at all → "no arbiter assigned" (and also unvouched).
+    { d: 'seed-unvouched-carol', title: 'Unlisted: marketing site refresh', patron: carol, arbiter: dave, target: 'proposed', amount: '40000' },
+    { d: 'seed-noarbiter-carol', title: 'Unassigned: CLI tooling rewrite', patron: carol, target: 'proposed', amount: '45000' },
   ];
 }
 
 /** Signer for a given status transition — the role that actually acts. */
 function signerFor(status: Status, spec: ProjectSpec): SeedAccount {
   if (status === 'submitted') return spec.worker ?? spec.patron;
-  if (status === 'concluded') return spec.arbiter;
+  if (status === 'concluded') return spec.arbiter ?? spec.patron; // arbiter-less projects never conclude
   return spec.patron; // proposed / funded / in_progress are patron-driven
 }
 
@@ -168,7 +176,7 @@ async function seedProject(
   summary: SeedSummary,
 ): Promise<void> {
   const taskCoord = `33401:${spec.patron.pub}:${spec.d}`;
-  const arbiterService = serviceCoord.get(spec.arbiter.pub);
+  const arbiterService = spec.arbiter ? serviceCoord.get(spec.arbiter.pub) : undefined;
   const targetIndex = STATUS_ORDER.indexOf(spec.target);
 
   let goalId: string | undefined;
@@ -178,7 +186,7 @@ async function seedProject(
   const baseTags = () => ({
     d: spec.d,
     patron: spec.patron.pub,
-    arbiter: spec.arbiter.pub,
+    arbiter: spec.arbiter?.pub,
     arbiterService,
     amount: spec.amount,
     fundingType: 'crowdfunding',
@@ -193,8 +201,9 @@ async function seedProject(
   for (let i = 0; i <= targetIndex; i++) {
     const status = STATUS_ORDER[i] as Status;
 
-    // Funding artifacts appear at the moment the project opens for funding.
-    if (status === goalStatus && !goalId) {
+    // Funding artifacts appear at the moment the project opens for funding. An
+    // arbiter-less project never opens for funding (no escrow holder), so guard on it.
+    if (status === goalStatus && !goalId && spec.arbiter) {
       const goal = publishGoal(relayUrl, {
         sec: spec.patron.sec,
         taskCoord,
@@ -216,7 +225,7 @@ async function seedProject(
     // The arbiter pays the worker (mocked) just before concluding.
     if (status === 'concluded') {
       const payout = mockZapReceipt(relayUrl, {
-        sec: spec.arbiter.sec,
+        sec: (spec.arbiter ?? spec.patron).sec,
         goalId: goalId ?? taskCoord,
         amount: spec.amount,
         recipient: (spec.worker ?? spec.patron).pub,
@@ -235,8 +244,9 @@ async function seedProject(
     });
     if (status === 'submitted') submittedTaskId = id;
 
-    // Conclude after the concluded task version is on the relay.
-    if (status === 'concluded') {
+    // Conclude after the concluded task version is on the relay. Only arbiter-backed
+    // projects ever reach `concluded`; the guard also narrows the type.
+    if (status === 'concluded' && spec.arbiter) {
       publishConclusion(relayUrl, {
         sec: spec.arbiter.sec,
         taskCoord,

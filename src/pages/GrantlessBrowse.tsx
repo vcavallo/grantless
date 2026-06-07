@@ -3,9 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import { CuratorBrowser } from '@/components/grantless/CuratorBrowser';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
+import { useIsOperator } from '@/hooks/useIsOperator';
 
 export default function GrantlessBrowse() {
   const { npub } = useParams<{ npub: string }>();
+  const isOperator = useIsOperator();
   return (
     <>
       <Helmet>
@@ -22,6 +24,11 @@ export default function GrantlessBrowse() {
             <div className="flex items-baseline justify-between gap-4">
               <h1 className="text-4xl font-bold">Grantless</h1>
               <div className="flex items-center gap-2">
+                {isOperator && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/admin">Admin</Link>
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/about">About</Link>
                 </Button>

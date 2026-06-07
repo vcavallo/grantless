@@ -6,6 +6,7 @@ import ApplicantProjects from "./pages/ApplicantProjects";
 import CuratorContributors from "./pages/CuratorContributors";
 import { TaskDetail } from "./pages/TaskDetail";
 import About from "./pages/About";
+import OperatorPanel from "./pages/OperatorPanel";
 import NotFound from "./pages/NotFound";
 
 export function AppRouter() {
@@ -19,6 +20,7 @@ export function AppRouter() {
         <Route path="/p/:npub" element={<ApplicantProjects />} />
         <Route path="/task/:nip19" element={<TaskDetail />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin" element={<OperatorPanel />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -193,13 +193,51 @@ export function resolveCuratorApplicants(
   return applicantsForCurator(applicantCurationLists(events, slug), curator);
 }
 
+// ---- Operator helper panel: stuck-project diagnostics (Story 16) ----
+
 /**
- * Parse a configured curator list (e.g. from `VITE_GRANTLESS_CURATORS`): a
- * comma-separated mix of `npub…` and 64-char hex pubkeys. Invalid tokens are
- * dropped; the result is hex, deduped. Empty/undefined → `[]` (discovery only).
- * This is a plain, overridable convenience — no curator is privileged.
+ * The set of pubkeys vouched by *any* curator — the union of every applicant
+ * curation list's members. A creator absent from this set appears in no curator's
+ * browse. Pure; membership only — no pubkey is privileged.
  */
-export function parseConfiguredCurators(raw: string | undefined): string[] {
+export function vouchedApplicantPubkeys(lists: CurationList[]): Set<string> {
+  const vouched = new Set<string>();
+  for (const list of lists) {
+    for (const member of list.members) vouched.add(member);
+  }
+  return vouched;
+}
+
+export interface StuckProjects {
+  /** Projects whose creator is in no curator's applicant set (invisible in browse). */
+  unvouched: TaskProposal[];
+  /** Projects with no arbiter assigned (cannot open for funding). */
+  arbiterless: TaskProposal[];
+}
+
+/**
+ * Partition the "stuck" crowdfunding projects an operator might help with. Pure.
+ * Concluded projects are excluded (no longer fundable). A project may appear in
+ * both buckets. Detection is purely structural — set membership and the presence
+ * of an arbiter — so every pubkey is treated identically (no special-casing).
+ */
+export function findStuckProjects(
+  tasks: TaskProposal[],
+  vouched: Set<string>,
+): StuckProjects {
+  const active = tasks.filter((task) => task.status !== 'concluded');
+  return {
+    unvouched: active.filter((task) => !vouched.has(task.patronPubkey)),
+    arbiterless: active.filter((task) => !task.arbiterPubkey),
+  };
+}
+
+/**
+ * Parse a comma-separated mix of `npub…` and 64-char hex pubkeys into deduped
+ * hex. Invalid tokens are dropped; whitespace is tolerated; empty/undefined → `[]`.
+ * The generic primitive behind the env-driven pubkey lists (curators, operators).
+ */
+export function parsePubkeyList(raw: string | undefined): string[] {
   if (!raw) return [];
   const seen = new Set<string>();
   const result: string[] = [];
@@ -223,6 +261,26 @@ export function parseConfiguredCurators(raw: string | undefined): string[] {
     }
   }
   return result;
+}
+
+/**
+ * Parse a configured curator list (e.g. from `VITE_GRANTLESS_CURATORS`): a
+ * comma-separated mix of `npub…` and 64-char hex pubkeys. Empty/undefined → `[]`
+ * (discovery only). A plain, overridable convenience — no curator is privileged.
+ */
+export function parseConfiguredCurators(raw: string | undefined): string[] {
+  return parsePubkeyList(raw);
+}
+
+/**
+ * Parse the configured operator pubkey(s) (e.g. from `VITE_GRANTLESS_OPERATOR`):
+ * a comma-separated mix of `npub…`/hex. Empty/undefined → `[]` (the operator
+ * helper panel is then hidden for everyone). An overridable convenience that
+ * gates a read-only helper view — it grants NO protocol capability and no pubkey
+ * is privileged; a forker sets their own and the app behaves identically.
+ */
+export function parseOperatorPubkeys(raw: string | undefined): string[] {
+  return parsePubkeyList(raw);
 }
 
 /** An arbiter offerable for selection: a curator-vouched pubkey that has a 33400
