@@ -101,6 +101,6 @@ deliberately to stay compliant:
   direct route) — a "how" detail for the Architect.
 
 ## Linked artifacts
-- ADR: (filled in after Architecture phase)
-- Test plan: (filled in after Test Design phase)
+- ADR: `.pi/engineering-team/decisions/0015-operator-helper-panel.md`
+- Test plan: `.pi/engineering-team/stories/16-operator-helper-panel.test-plan.md`
 - Review: (filled in after Review phase)
