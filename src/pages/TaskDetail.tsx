@@ -13,8 +13,11 @@ import { useToast } from '@/hooks/useToast';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { TaskLifecycleActions } from '@/components/grantless/TaskLifecycleActions';
+import { EditProjectDialog } from '@/components/grantless/EditProjectDialog';
 import { CATALLAX_KINDS, latestAuthoritativeTask, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
+import { canEditTask } from '@/lib/grantless';
 import { useCatallaxInvalidation } from '@/hooks/useCatallax';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { shortNpub } from '@/lib/shortNpub';
 import { RelaySelector } from '@/components/RelaySelector';
 import { CopyNpubButton } from '@/components/CopyNpubButton';
@@ -26,6 +29,7 @@ export function TaskDetail() {
   const { nostr } = useNostr();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useCurrentUser();
   const { invalidateAllCatallaxQueries } = useCatallaxInvalidation();
   // Curator context for the arbiter options on this (non-curator-scoped) page.
   const [rememberedCurator] = useLocalStorage<string>('grantless:lastCurator', '');
@@ -313,9 +317,12 @@ export function TaskDetail() {
                   Task ID: {task.d}
                 </CardDescription>
               </div>
-              <Badge className={getStatusColor(task.status)}>
-                {task.status.replace('_', ' ')}
-              </Badge>
+              <div className="flex shrink-0 items-center gap-2">
+                {canEditTask(task, user?.pubkey) && <EditProjectDialog task={task} />}
+                <Badge className={getStatusColor(task.status)}>
+                  {task.status.replace('_', ' ')}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
 
