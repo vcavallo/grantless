@@ -57,15 +57,18 @@ relay and it works identically (Grantless prime directive). `negentropy` is enab
 
 Run from the host where the strfry container runs:
 
-The `dockurr/strfry` image doesn't put `strfry` on `$PATH`, so call it by absolute path
-(`/app/strfry`). Confirm yours with
-`docker exec grantless-strfry-prod sh -c 'tr "\0" " " < /proc/1/cmdline; echo'`.
+The `dockurr/strfry` image keeps the binary at `/app/strfry` (NOT on `$PATH`) and resolves
+its config/DB relative to `/app` (its wrapper does `cd /app && ./strfry relay`), so call it
+by absolute path **with `-w /app`**. Confirm the binary path with
+`docker exec grantless-strfry-prod sh -c 'find / -name strfry -type f 2>/dev/null'`.
 
 ```sh
 # Negentropy (NIP-77) — efficient diff. Try this first:
-docker exec grantless-strfry-prod \
+docker exec -w /app grantless-strfry-prod \
   /app/strfry sync wss://tags.brainstorm.world/relay --filter '{"kinds":[30392]}' --dir down
 ```
+
+(If it complains about config/DB, add the global `--config /etc/strfry.conf` before `sync`.)
 
 ⚠️ `tags.brainstorm.world` is a `strfry+nip50-proxy` reached at `/relay`; the search proxy
 **may not pass NIP-77 (`NEG-OPEN`) through**. If the command errors or hangs, use the
@@ -73,7 +76,7 @@ docker exec grantless-strfry-prod \
 
 ```sh
 nak req -k 30392 wss://tags.brainstorm.world/relay \
-  | docker exec -i grantless-strfry-prod /app/strfry import
+  | docker exec -i -w /app grantless-strfry-prod /app/strfry import
 ```
 
 `relay/sync-curation.sh` wraps both: it tries negentropy and falls back to `nak|import`
@@ -92,17 +95,26 @@ automatically (`MODE=auto`). Every input is an overridable env var (`SOURCE_RELA
 */5 * * * * /path/to/relay/sync-curation.sh >> /var/log/grantless-sync.log 2>&1
 ```
 
-### 3. Advanced: continuous streaming (`strfry router`)
+### 3. Advanced: continuous streaming (image-native `ROUTER`)
 
-For real-time mirroring instead of polling, `relay/router.conf` runs a live down-stream
-subscription (proxy-safe; no NIP-77 needed). Backfill once with step 1, then:
+For real-time mirroring instead of polling, the `dockurr/strfry` image has a **built-in
+router**: its entrypoint runs `./strfry router /etc/strfry-router.conf` when `ROUTER=1`. So,
+in `docker-compose.prod.yml`, mount the filtered config and flip the flag:
 
-```sh
-strfry router relay/router.conf
+```yaml
+    environment:
+      - ROUTER=1
+    volumes:
+      - ./router.conf:/etc/strfry-router.conf:ro
 ```
 
-(Verify the router config schema against your strfry version — it has shifted across
-releases.) Optionally run it as a second `docker-compose.prod.yml` service.
+`relay/router.conf` is that config (a `down`-only, kind-30392 subscription — proxy-safe, no
+NIP-77 needed). Backfill once with step 1, then the router keeps it current live; a
+low-frequency cron sync (step 2) covers any reconnect gaps.
+
+> Don't use the image's `STREAMS=<relay>` env for this — `strfry stream` is an unfiltered
+> firehose (it'd pull *all* of Brainstorm). The router config is the filtered path.
+> Verify the router schema against your strfry version — it has shifted across releases.
 
 > **Relay-policy note:** the app deliberately does **not** broadcast list/tagging events to
 > `relay.grantless.org` (only Catallax protocol events). This mirror is a separate,
