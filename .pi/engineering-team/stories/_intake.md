@@ -456,3 +456,12 @@ code, no story/ADR (matches the deploy/relay-standup chore precedent).
 **Left to do (on the prod host, by the user):** run the one-shot to learn if Brainstorm's nip50-proxy
 passes NIP-77; pin `MODE=negentropy` or `MODE=fetch` accordingly; install the cron. Then `relay.grantless.org`
 serves the 30392s and curator discovery survives a Brainstorm outage (no app change — it's preset #1).
+
+## 2026-06-08 — Negentropy mirror: WORKS (open question resolved)
+**Result:** `docker exec -w /app grantless-strfry-prod /app/strfry sync wss://tags.brainstorm.world/relay
+--filter '{"kinds":[30392]}' --dir down` succeeded on the prod box → **Brainstorm's nip50-proxy DOES pass
+NIP-77**. Pin `MODE=negentropy` (efficient diff); the nak|import fallback is unneeded. Image quirks
+learned: binary at `/app/strfry` (not on $PATH), must run with `-w /app`; the dockurr image also has a
+built-in router (`ROUTER=1` + mount router.conf → /etc/strfry-router.conf) for real-time mirroring.
+**Left:** install the cron (or flip ROUTER=1) on the box; then relay.grantless.org serves the 30392s and
+curator discovery survives a Brainstorm outage with no app change.
