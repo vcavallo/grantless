@@ -96,6 +96,6 @@ Catallax is open, permissionless, WoT-based — this story respects that:
   edit form now has it), or leave creation as-is and only expose deadline on edit — Architect's call.
 
 ## Linked artifacts
-- ADR: (filled in after Architecture phase)
-- Test plan: (filled in after Test Design phase)
+- ADR: `.pi/engineering-team/decisions/0017-edit-task-fields.md`
+- Test plan: `.pi/engineering-team/stories/18-edit-task-fields.test-plan.md`
 - Review: (filled in after Review phase)
