@@ -446,3 +446,13 @@ serverless functions).
 and makes rich previews Vercel-specific (forkers on plain static hosting degrade gracefully to generic
 previews — document as a progressive enhancement; prime-directive-fine: reads public events from the
 overridable relay set, no privilege). `/plan-feature` candidate when revisited.
+
+## 2026-06-07 — Negentropy mirror: repo artifacts landed (execution pending on prod box)
+**Status:** Repo side DONE — added `relay/sync-curation.sh` (tries negentropy `strfry sync --dir down`,
+falls back to proxy-safe `nak req | strfry import`; all-env-overridable), `relay/router.conf` (advanced
+continuous-streaming example, verify-for-version), and rewrote the relay README "Later" stub into the
+real procedure (one-shot + NIP-77 caveat + cron + router + relay-policy note). Relay-ops chore, no app
+code, no story/ADR (matches the deploy/relay-standup chore precedent).
+**Left to do (on the prod host, by the user):** run the one-shot to learn if Brainstorm's nip50-proxy
+passes NIP-77; pin `MODE=negentropy` or `MODE=fetch` accordingly; install the cron. Then `relay.grantless.org`
+serves the 30392s and curator discovery survives a Brainstorm outage (no app change — it's preset #1).
