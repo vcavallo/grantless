@@ -14,6 +14,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { TaskLifecycleActions } from '@/components/grantless/TaskLifecycleActions';
 import { EditProjectDialog } from '@/components/grantless/EditProjectDialog';
+import { PatronGuidance } from '@/components/grantless/PatronGuidance';
 import { CATALLAX_KINDS, latestAuthoritativeTask, formatSats, getStatusColor, type TaskProposal } from '@/lib/catallax';
 import { canEditTask } from '@/lib/grantless';
 import { useCatallaxInvalidation } from '@/hooks/useCatallax';
@@ -306,6 +307,9 @@ export function TaskDetail() {
             </Button>
           </div>
         </div>
+
+        {/* Author-facing guidance: the "stuck" conditions, first-person + actionable */}
+        <PatronGuidance task={task} />
 
         {/* Task Details */}
         <Card>
