@@ -7,6 +7,8 @@ import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persist
 import { HelmetProvider } from 'react-helmet-async';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import superjson from 'superjson';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import NostrProvider from '@/components/NostrProvider';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -35,11 +37,16 @@ const queryClient = new QueryClient({
 const persister = createSyncStoragePersister({
   storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   key: 'grantless:query-cache',
+  // superjson (not plain JSON) so query data containing Maps/Sets/Dates round-trips
+  // correctly — several hooks return Map data (e.g. useGoalsProgress, useNomineeProfiles),
+  // and JSON would silently turn a Map into {} and crash consumers on restore.
+  serialize: (client) => superjson.stringify(client),
+  deserialize: (cached) => superjson.parse(cached),
 });
 const persistOptions = {
   persister,
   maxAge: 1000 * 60 * 60 * 24, // 24h
-  buster: 'v1', // schema version — bump to discard all persisted data on a breaking change
+  buster: 'v2', // schema version — bumped to v2 to discard v1 (plain-JSON) caches after the superjson switch
 };
 
 // The default relay is a plain, overridable bootstrapping convenience — no relay is
@@ -76,6 +83,7 @@ function RouteFallback() {
 
 export function App() {
   return (
+    <ErrorBoundary>
     <HelmetProvider>
       <AppProvider storageKey="nostr:app-config" defaultConfig={defaultConfig} presetRelays={presetRelays}>
         <RelayEnvOverride />
@@ -94,6 +102,7 @@ export function App() {
         </PersistQueryClientProvider>
       </AppProvider>
     </HelmetProvider>
+    </ErrorBoundary>
   );
 }
 
