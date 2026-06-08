@@ -465,3 +465,18 @@ learned: binary at `/app/strfry` (not on $PATH), must run with `-w /app`; the do
 built-in router (`ROUTER=1` + mount router.conf → /etc/strfry-router.conf) for real-time mirroring.
 **Left:** install the cron (or flip ROUTER=1) on the box; then relay.grantless.org serves the 30392s and
 curator discovery survives a Brainstorm outage with no app change.
+
+## 2026-06-08 — Story 17 done: faster loads (caching + code-splitting) — shipped to master
+**Status:** DONE — story 17 / ADR 0016 / review 17 (PASS). Test Design skipped by decision; verified on
+Vercel staging, merged to master. Persist react-query cache to localStorage (superjson — Map-safe),
+stale-while-revalidate (dropped catallax staleTime:0/focus overrides; own-actions stay fresh via the
+existing useNostrPublish ['catallax'] invalidation), relay set added to all catallax query keys
+(cross-context cache correctness), hot browse timeout 10s→5s, React.lazy routes (bundle 775KB→~518KB core
++ per-page chunks), ErrorBoundary safety net.
+**Regression caught + fixed on staging (b68e525):** plain-JSON persistence corrupted Map query data
+(useGoalsProgress/useNomineeProfiles) → "S.get is not a function" white screen on REFRESH only. Fix:
+superjson serializer + buster v1→v2 (discards old broken caches) + ErrorBoundary. The vercel.live CSP block
+& manifest 401 on the branch deploy were Vercel preview-env noise, NOT the crash.
+**Non-blocking follow-ups (from review):** (a) add a persistence round-trip unit test (Map survives
+persist→restore) — the serializer is now load-bearing; (b) optional manualChunks vendor split (core still
+>500KB); (c) the parked 2026-06-05 funding-load progressive-render note remains a deeper follow-on.

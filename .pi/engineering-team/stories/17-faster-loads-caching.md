@@ -1,6 +1,6 @@
 # Story 17: Faster loads — caching + incremental rendering for browse & project detail
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-08
 **Type:** Feature (performance)
 
@@ -85,4 +85,4 @@ Catallax is open, permissionless, WoT-based — this story does not touch that:
   can't run in this env. Verification gate instead = the existing quality gates stay green
   (`npm test`/eslint/tsc/build) + **manual verification on a Vercel staging deploy** (warm reload;
   own-action immediacy; relay-switch shows no prior-relay cache; on-demand route chunks).
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/17-faster-loads-caching.md` — **PASS**
