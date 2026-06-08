@@ -1,5 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { useAppContext } from '@/hooks/useAppContext';
+import { getActiveRelays } from '@/lib/relays';
 import {
   CATALLAX_KINDS,
   parseArbiterAnnouncement,
@@ -31,9 +33,11 @@ export function useCatallaxInvalidation() {
 
 export function useArbiterAnnouncements() {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'arbiters'],
+    queryKey: ['catallax', 'arbiters', activeRelays],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(10000)]);
       const events = await nostr.query([
@@ -63,18 +67,20 @@ export function useArbiterAnnouncements() {
       return Array.from(latestAnnouncements.values())
         .sort((a, b) => b.created_at - a.created_at);
     },
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
 export function useTaskProposals(status?: TaskStatus) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'tasks', status],
+    queryKey: ['catallax', 'tasks', status, activeRelays],
     queryFn: async (c) => {
-      const signal = AbortSignal.any([c.signal, AbortSignal.timeout(10000)]);
+      // Lower than the other catallax queries: the browse shows cached-first (SWR +
+      // persisted cache), so a snappier cold-load budget beats blocking on a slow relay.
+      const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
       // Don't filter by status in the query - get ALL task events and filter after deduplication
       // This ensures we get all versions of each task to find the latest status
@@ -87,29 +93,6 @@ export function useTaskProposals(status?: TaskStatus) {
       ];
 
       const events = await nostr.query(filters, { signal });
-
-      console.log('Raw task events found:', events.length);
-      console.log('Raw events by d-tag:', events.reduce((acc, e) => {
-        const d = e.tags.find(([name]) => name === 'd')?.[1];
-        const eventStatus = e.tags.find(([name]) => name === 'status')?.[1] || 'unknown';
-        if (d) {
-          if (!acc[d]) acc[d] = [];
-          acc[d].push({ id: e.id.slice(0, 8), created_at: e.created_at, status: eventStatus, pubkey: e.pubkey.slice(0, 8) });
-        }
-        return acc;
-      }, {} as Record<string, Array<{ id: string; created_at: number; status: string; pubkey: string }>>));
-
-      // Log events sorted by created_at to see the order
-      console.log('All events sorted by created_at (newest first):', events
-        .sort((a, b) => b.created_at - a.created_at)
-        .map(e => ({
-          id: e.id.slice(0, 8),
-          created_at: e.created_at,
-          status: e.tags.find(([name]) => name === 'status')?.[1] || 'unknown',
-          d: e.tags.find(([name]) => name === 'd')?.[1],
-          date: new Date(e.created_at * 1000).toISOString()
-        }))
-      );
 
       const parsedTasks = events
         .map(parseTaskProposal)
@@ -148,20 +131,18 @@ export function useTaskProposals(status?: TaskStatus) {
 
       result = result.sort((a, b) => b.created_at - a.created_at);
 
-      console.log('useTaskProposals result:', result.map(t => ({ d: t.d, status: t.status, created_at: t.created_at, workerPubkey: t.workerPubkey })));
-
       return result;
     },
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
 export function useTaskConclusions() {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'conclusions'],
+    queryKey: ['catallax', 'conclusions', activeRelays],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(10000)]);
       const events = await nostr.query([
@@ -171,38 +152,23 @@ export function useTaskConclusions() {
         }
       ], { signal });
 
-      console.log('Raw conclusion events found:', events.length);
-
       const conclusions = events
-        .map((event, index) => {
-          const parsed = parseTaskConclusion(event);
-          if (!parsed) {
-            console.log(`Failed to parse conclusion event ${index}:`, event);
-          }
-          return parsed;
-        })
+        .map(parseTaskConclusion)
         .filter((conclusion): conclusion is TaskConclusion => conclusion !== null)
         .sort((a, b) => b.created_at - a.created_at);
 
-      console.log('useTaskConclusions result:', conclusions.map(c => ({
-        id: c.id,
-        resolution: c.resolution,
-        created_at: c.created_at,
-        taskReference: c.taskReference
-      })));
-
       return conclusions;
     },
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
 export function useMyArbiterServices(pubkey?: string) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'my-services', pubkey],
+    queryKey: ['catallax', 'my-services', pubkey, activeRelays],
     queryFn: async (c) => {
       if (!pubkey) return [];
 
@@ -236,16 +202,16 @@ export function useMyArbiterServices(pubkey?: string) {
         .sort((a, b) => b.created_at - a.created_at);
     },
     enabled: !!pubkey,
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
 export function useMyTasks(pubkey?: string) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'my-tasks', pubkey],
+    queryKey: ['catallax', 'my-tasks', pubkey, activeRelays],
     queryFn: async (c) => {
       if (!pubkey) return [];
 
@@ -285,34 +251,27 @@ export function useMyTasks(pubkey?: string) {
           return;
         }
 
-        console.log(`Deduplication for ${task.d}: existing=${existing?.created_at || 'none'}, current=${task.created_at}, status=${task.status}`);
-
         if (!existing || task.created_at > existing.created_at) {
-          console.log(`Setting latest for ${task.d}: ${task.status} (${task.created_at})`);
           latestTasks.set(key, task);
-        } else {
-          console.log(`Keeping existing for ${task.d}: ${existing.status} (${existing.created_at})`);
         }
       });
 
       const result = Array.from(latestTasks.values())
         .sort((a, b) => b.created_at - a.created_at);
 
-      console.log('useMyTasks result for', pubkey, ':', result.map(t => ({ d: t.d, status: t.status, created_at: t.created_at, workerPubkey: t.workerPubkey })));
-
       return result;
     },
     enabled: !!pubkey,
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
 export function useTasksForWorker(pubkey?: string) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'worker-tasks', pubkey],
+    queryKey: ['catallax', 'worker-tasks', pubkey, activeRelays],
     queryFn: async (c) => {
       if (!pubkey) return [];
 
@@ -358,8 +317,6 @@ export function useTasksForWorker(pubkey?: string) {
         .sort((a, b) => b.created_at - a.created_at);
     },
     enabled: !!pubkey,
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }
 
@@ -384,9 +341,11 @@ export function useArbiterExperience() {
 
 export function useTasksForArbiter(pubkey?: string) {
   const { nostr } = useNostr();
+  const { config, presetRelays } = useAppContext();
+  const activeRelays = getActiveRelays(config, presetRelays);
 
   return useQuery({
-    queryKey: ['catallax', 'arbiter-tasks', pubkey],
+    queryKey: ['catallax', 'arbiter-tasks', pubkey, activeRelays],
     queryFn: async (c) => {
       if (!pubkey) return [];
 
@@ -432,7 +391,5 @@ export function useTasksForArbiter(pubkey?: string) {
         .sort((a, b) => b.created_at - a.created_at);
     },
     enabled: !!pubkey,
-    staleTime: 0, // Always consider data stale to ensure fresh queries
-    refetchOnWindowFocus: true,
   });
 }

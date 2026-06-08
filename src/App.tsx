@@ -1,9 +1,12 @@
 // NOTE: This file should normally not be modified unless you are adding a new provider.
 // To add new routes, edit the AppRouter.tsx file.
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { HelmetProvider } from 'react-helmet-async';
 import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 import NostrProvider from '@/components/NostrProvider';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,6 +26,21 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Persist the query cache to localStorage so a hard reload paints last-seen content
+// immediately (then revalidates) instead of starting cold. Local, per-browser, public
+// Nostr events only — no privilege, fork-safe. Relay/account context lives in the query
+// keys (so a relay/account switch never reuses another context's cache); `buster` is a
+// schema version — bump it to discard all persisted data on a breaking cache change.
+const persister = createSyncStoragePersister({
+  storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  key: 'grantless:query-cache',
+});
+const persistOptions = {
+  persister,
+  maxAge: 1000 * 60 * 60 * 24, // 24h
+  buster: 'v1', // schema version — bump to discard all persisted data on a breaking change
+};
 
 // The default relay is a plain, overridable bootstrapping convenience — no relay is
 // privileged (Grantless prime directive). Two env overrides, both optional:
@@ -47,24 +65,33 @@ const presetRelays = [
   { url: 'wss://relay.primal.net', name: 'Primal' },
 ];
 
+/** Minimal fallback while a route's lazy chunk loads. */
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
 export function App() {
   return (
     <HelmetProvider>
       <AppProvider storageKey="nostr:app-config" defaultConfig={defaultConfig} presetRelays={presetRelays}>
         <RelayEnvOverride />
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
           <NostrLoginProvider storageKey='nostr:login'>
             <NostrProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
-                <Suspense>
+                <Suspense fallback={<RouteFallback />}>
                   <AppRouter />
                 </Suspense>
               </TooltipProvider>
             </NostrProvider>
           </NostrLoginProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </AppProvider>
     </HelmetProvider>
   );
