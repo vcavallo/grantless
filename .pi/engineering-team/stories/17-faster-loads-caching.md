@@ -79,6 +79,10 @@ Catallax is open, permissionless, WoT-based — this story does not touch that:
   criterion already covers the user-visible part.
 
 ## Linked artifacts
-- ADR: (filled in after Architecture phase)
-- Test plan: (filled in after Test Design phase)
+- ADR: `.pi/engineering-team/decisions/0016-faster-loads-caching.md`
+- Test plan: **Skipped by user decision (2026-06-08).** The ACs are observable-in-browser perf/UX
+  properties that don't fit the project's real-event/no-mocked-`useNostr` test style, and Playwright
+  can't run in this env. Verification gate instead = the existing quality gates stay green
+  (`npm test`/eslint/tsc/build) + **manual verification on a Vercel staging deploy** (warm reload;
+  own-action immediacy; relay-switch shows no prior-relay cache; on-demand route chunks).
 - Review: (filled in after Review phase)
