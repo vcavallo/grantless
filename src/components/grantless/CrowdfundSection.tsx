@@ -15,6 +15,17 @@ import {
 } from '@/lib/catallax';
 import { ContributeDialog } from './ContributeDialog';
 import { ContributorList } from './ContributorList';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -95,10 +106,28 @@ export function CrowdfundSection({ task, onUpdate }: CrowdfundSectionProps) {
               Opening for funding… (waiting for the relays to confirm)
             </p>
           ) : isPatron && task.arbiterPubkey && task.status === 'proposed' ? (
-            <Button size="sm" disabled={isPending} onClick={openForFunding}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Open for funding
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" disabled={isPending}>
+                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Open for funding
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Open this project for funding?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Once funding is open, the goal amount is locked and can't be changed — changing it
+                    would mean a new goal and would orphan any contributions. Make sure the amount
+                    ({formatSats(task.amount)}) is right first.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={openForFunding}>Open for funding</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           ) : isPatron && !task.arbiterPubkey ? (
             <p className="text-sm text-muted-foreground">Assign an arbiter before opening this project for funding.</p>
           ) : (

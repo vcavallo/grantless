@@ -193,6 +193,39 @@ export function resolveCuratorApplicants(
   return applicantsForCurator(applicantCurationLists(events, slug), curator);
 }
 
+// ---- Patron task editing (Story 18) ----
+
+/**
+ * Whether `viewerPubkey` may edit `task`'s fields: only the patron (author), and
+ * only while the task is still `proposed`. Pure patron-equality — no pubkey is
+ * privileged; a patron can only ever edit their own task (re-publishing their own
+ * addressable event, which Nostr allows inherently).
+ */
+export function canEditTask(task: TaskProposal, viewerPubkey: string | undefined): boolean {
+  return !!viewerPubkey && viewerPubkey === task.patronPubkey && task.status === 'proposed';
+}
+
+/**
+ * Whether the task's funding amount is still editable: only while `proposed` AND no
+ * goal exists yet. The NIP-75 goal (9041) isn't replaceable and contributions point
+ * at a specific goal id, so once funding opens the amount is locked.
+ */
+export function canEditTaskAmount(task: TaskProposal): boolean {
+  return task.status === 'proposed' && !task.goalId;
+}
+
+/**
+ * Parse a `<input type="date">` value (`YYYY-MM-DD`) into a unix-seconds timestamp
+ * at UTC midnight, or `undefined` for empty/invalid input. Never defaults to a date —
+ * an empty deadline stays empty (and is therefore omitted from the task).
+ */
+export function parseDeadlineInput(value: string): number | undefined {
+  const token = value.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(token)) return undefined;
+  const ms = Date.parse(`${token}T00:00:00Z`);
+  return Number.isNaN(ms) ? undefined : Math.floor(ms / 1000);
+}
+
 // ---- Operator helper panel: stuck-project diagnostics (Story 16) ----
 
 /**

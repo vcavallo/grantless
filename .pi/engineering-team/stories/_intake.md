@@ -6,6 +6,7 @@ raw requests here, classifies them, and notes the phase path before a story is w
 ---
 
 ## 2026-06-01 — Minimal nominee browser
+
 **Raw:** Build the minimal gig browser for a Curator's chosen OpenSet. Paste an naddr of a
 30392 TL / 30000 follow set / 39089 starter pack as a stand-in for the "Grantless Nominee"
 set; show each nominee profile with their Catallax projects beneath ("No projects yet" when
@@ -14,6 +15,7 @@ none) so the screen is never empty.
 **Status:** In planning → `stories/1-minimal-nominee-browser.md`.
 
 ## 2026-06-01 — Deploy to Vercel + grantless.org domain
+
 **Raw:** "i bought grantless.org … get SOMETHING up on vercel, and the domain settings so i
 can test it out at grantless.org. As soon as we have anything at all ready to deploy."
 **Classified:** Ops / deployment chore (not an app-behavior feature; no test phase needed).
@@ -22,6 +24,7 @@ Gated on the first deployable artifact — Story 1 is the natural candidate.
 confirm it loads. Treat as a chore, executed on explicit go-ahead (outward action).
 
 ## 2026-06-01 — Grantless default relay policy (relay.grantless.org)
+
 **Raw:** Host a strfry relay at `wss://relay.grantless.org`. All **Catallax events** should
 broadcast to that relay (in addition to the user's relay set) AND be read from it (in addition
 to the user's relay set) — an "always-on failsafe" for Grantless Catallax events. Explicitly
@@ -37,7 +40,9 @@ working app. It is "always-on by default," never "mandatory." Confirm this frami
 user before writing the story.
 
 ## 2026-06-02 — Grantless MVP epic
+
 **Raw:** Curator selector via grantless-applicants curation; full test infra (strfry-in-Docker
+
 + nak e2e + dev seed); TDD the 7 write/browse features; shareable URLs; replaceable-event care.
 **Classified:** Epic → `epics/grantless-mvp.md`. Curation chain resolved (`observer`/`source-tag`
 on kind 30392; validated on `wss://tags.brainstorm.world/relay`). Sequence: test infra →
@@ -48,6 +53,7 @@ chain with nak.
 **Next:** `/plan-feature` → Story 2 (test infrastructure).
 
 ## 2026-06-03 — Dev seed
+
 **Raw:** Continue the epic — Story 3 (dev seed). Run all engineering-team phases autonomously;
 user checks in after the final review.
 **Classified:** Feature (infrastructure). Standard strictness → full phase path
@@ -61,6 +67,7 @@ surfaced via a roster fixture + printed on run; optional `VITE_RELAY_URL` (unset
 **Status:** → `stories/3-dev-seed.md` (Approved).
 
 ## 2026-06-03 — Curator selector + real applicant view
+
 **Raw:** Continue the epic — Story 4. Run all engineering-team phases autonomously;
 user checks in after the final review.
 **Classified:** Feature. Standard strictness → full phase path
@@ -74,6 +81,7 @@ superseded; curator-in-URL deferred to Story 11.
 **Status:** → `stories/4-curator-selector.md` (Approved).
 
 ## 2026-06-03 — Fix: VITE_RELAY_URL ignored for returning users
+
 **Raw:** During Story 4 manual verification, `npm run dev` showed "No curators found" —
 the app queried a stale relay. Root cause: `VITE_RELAY_URL` was only the *default* for
 empty localStorage, so AppProvider's persisted `nostr:app-config` won over it for anyone
@@ -84,6 +92,7 @@ set (overrides persisted relay → custom/customRelay), no-op when unset. Belong
 `VITE_RELAY_URL` feature. Gates clean; manual-verify (UI, per the feature's nature).
 
 ## 2026-06-03 — Fix: CSP blocked ws:// to the local relay (the real blocker)
+
 **Raw:** Local browse showed no data even on the dev machine; console: CSP blocked
 ws://127.0.0.1:7787 (connect-src 'self' blob: https: wss:). The static CSP <meta> in
 index.html allows secure wss: but not plaintext ws:, so the browser blocked ALL
@@ -95,6 +104,7 @@ build's CSP stays strict (wss: only). Verified: dev index has ws:, dist/index.ht
 not. Belongs to Story 3's local-relay dev infra. Gates clean.
 
 ## 2026-06-03 — Create a project (first write flow)
+
 **Raw:** Continue the epic — Story 5. Run all engineering-team phases autonomously;
 user checks in after the final review.
 **Classified:** Feature (first write flow). Standard strictness → full phase path.
@@ -109,6 +119,7 @@ logged in (Architect picks dialog vs route + reuse vs fresh).
 **Status:** → `stories/5-create-project.md` (Approved).
 
 ## 2026-06-03 — Assign an arbiter (curator-vouched) [epic "Assent to arbitrate"]
+
 **Raw:** Continue the epic — Story 6. Run all phases autonomously; user checks in after review.
 **Classified:** Feature. Standard strictness → full phase path. The patron assigns an arbiter to
 their proposed 33401, chosen from the currently-selected curator's grantless-arbiter list (kind
@@ -122,6 +133,7 @@ in-app assent would be a separate story + NIP change.
 **Status:** → `stories/6-assent-to-arbitrate.md` (Approved).
 
 ## 2026-06-03 — Browser e2e (Playwright) + UX hardening [Story 2.5]
+
 **Raw:** During Story 6 manual testing the user hit: no visible login button (only via Post-a-
 project), arbiter control only on the browse index (not the task detail page), and a recurring
 "No curators found" regression in a returning logged-in session (incognito works). User: "perhaps
@@ -135,6 +147,7 @@ Architect decision; login affordance in the browse header.
 **Status:** → `stories/2.5-browser-e2e-ux-hardening.md` (Approved).
 
 ## 2026-06-03 — Fix: retry-once on publish (transient cold-socket write failure)
+
 **Raw:** User hit "Couldn't assign the arbiter — No Promise in Promise.any was resolved" once
 when changing the arbiter from the task detail page right after a hard refresh + login; worked on
 retry and on the index. Root cause: first write after a cold load races the relay websocket
@@ -146,6 +159,7 @@ publishWithRetry (one retry after 600ms; re-sending the same signed event is ide
 dedupe by id). Helps all write flows. Gates clean.
 
 ## 2026-06-03 — Role-based task management on the detail page [Story 6.5]
+
 **Raw:** /plan-feature — full "CRUD" / role-based task management on /task/:naddr for Patron,
 Arbiter, Worker; every action needed for the full Catallax loop (currently only Patron change-
 arbiter exists). Crowdfunding/contribution + real payments stay Story 7.
@@ -158,6 +172,7 @@ by patron (self-assign allowed); cancel = arbiter 3402 cancelled/abandoned.
 **Status:** → `stories/6.5-task-management-detail-page.md` (Approved). Running all phases.
 
 ## 2026-06-03 — Tweak: CRUD actions only on the detail page
+
 **Raw:** Remove the "change arbiter" UI from the index; all CRUD actions should only be on the
 detail page.
 **Classified:** Small UI change (Implementer + Reviewer). Removed AssignArbiterControl from the
@@ -166,6 +181,7 @@ curatorPubkey prop threading (NomineeCard/NomineeGrid/CuratorBrowser). Flipped t
 browse-card spec to guard that the index offers no management control. Gates + Playwright clean.
 
 ## 2026-06-03 — Tweak: arbiter picker shows identity, not the (shared) service title
+
 **Raw:** Arbiter dropdown options all said "Test Arbiter" while the task's Arbiter slot showed
 Dave/Erin. Cause: the picker labeled options by the kind-33400 service title (seed gives every
 arbiter the title "Test Arbiter"), whereas the slot uses the kind-0 profile name. Fix: label
@@ -173,6 +189,7 @@ options by profile identity (useAuthor, like the slot), with the service title a
 Implementer + Reviewer; gates + Playwright clean.
 
 ## 2026-06-03 — Seed: add a second curator (validate curator-switching)
+
 **Raw:** Add another curator to the seed to validate that changing the curator changes the
 arbiter set (and applicant set). Confirmed: the selected/remembered curator's grantless-arbiter
 list filters the arbiter options.
@@ -183,6 +200,7 @@ a new Playwright test asserts the detail-page arbiter options follow the remembe
 (under Quinn: Erin present, Dave absent). Gates + e2e (30) + Playwright (13) clean.
 
 ## 2026-06-03 — Contribute to a crowdfund [Story 7]
+
 **Raw:** Continue the epic — Story 7. Run all phases autonomously; check in at the final review.
 **Classified:** Feature. Standard → full phase path. A funder contributes (mocked) toward a task's
 NIP-75 9041 zap goal; funding progress shown. Adds "open for funding" (patron creates the 9041
@@ -193,6 +211,7 @@ anyone may contribute; payments mocked; reaching the goal is surfaced, mark-fund
 **Status:** → `stories/7-contribute-to-crowdfund.md` (Approved). Running all phases.
 
 ## 2026-06-03 — Browse under a Curator [Story 11]
+
 **Raw:** Index cards should show funding progress for funding-state tasks; add filters + sorts
 (incl. funding-progress sort), hide-concluded toggle, and more. User chose extras: seeking-
 funding, needs-a-worker, hide-empty-applicants (no text search); and include curator-in-URL now.
@@ -202,6 +221,7 @@ Extras as chosen. Shareable /c/:npub curator URL. Per-project funding fetched in
 **Status:** → `stories/11-browse-under-curator.md` (Approved). Running all phases.
 
 ## 2026-06-04 — Mid-polish batch (About page + browse copy + applicant pages)
+
 **Raw:** Add a short intro line under "The Invisible Handout" (provided copy) with a "how does
 this work?" link to the About page; swap the header "Catallax dashboard" link for "About"; write a
 first-draft Grantless About page (incl. a "Fork this and deploy your own version" → GitHub link);
@@ -210,15 +230,15 @@ page of just that applicant's projects (some applicants will have dozens); remov
 from N relay…" helper text under the curator picker.
 **Classified:** Mid-polish (Implementer-level, no full phase path — matches the 2.5/seed precedent
 for small UI work). Done directly:
-- `GrantlessBrowse`: intro paragraph + "how does this work?" link; header link → `/about`.
-- `About` (`/about`): rewrote the Catallax-protocol page into a **scoped Grantless About** first
++ `GrantlessBrowse`: intro paragraph + "how does this work?" link; header link → `/about`.
++ `About` (`/about`): rewrote the Catallax-protocol page into a **scoped Grantless About** first
   draft — roles, the flow, OpenSets-not-OpenSats / dlists / WoT / PoV, the 4-rung decentralization
   ladder (Grantless = rung 4, default relay framing), "Want to be an Arbiter?" + "Want to be a
   Curator?" sections, and a "Fork this and deploy your own version" GitHub link. (The old Catallax
   about content is in git history; the Catallax dashboard still owns the protocol-level explainer.)
-- New `/p/:npub` `ApplicantProjects` page (reuses `useTaskProposals` + `groupTasksByPatron` +
++ New `/p/:npub` `ApplicantProjects` page (reuses `useTaskProposals` + `groupTasksByPatron` +
   `useGoalsProgress`); `NomineeCard` previews 3 projects, links name + "view N more…" to it.
-- Removed the relay-provenance line in `CuratorBrowser`.
++ Removed the relay-provenance line in `CuratorBrowser`.
 Gates: tsc + eslint clean; unit (64) + seed e2e (11) + build pass. Playwright not run here
 (NixOS env lacks libnspr4/nss for the bundled chromium); reasoned the 3-cap keeps the
 concluded-visible browse spec green (concluded-alice is seeded last → newest → in top-3).
@@ -226,6 +246,7 @@ concluded-visible browse spec green (concluded-alice is seeded last → newest �
 user to revise copy.
 
 ## 2026-06-04 — Become an Arbiter (Grantless flow) [proposed story/epic]
+
 **Raw:** "We don't have an 'I want to be an Arbiter' flow anywhere." Add a "Become an Arbiter" UX
 (like "Post a project"), surfaced on the browse header and explained on the About page among how
 arbiters work.
@@ -242,6 +263,7 @@ whether to show "you're announced but not yet vouched by <curator>" state. The A
 has a "Want to be an Arbiter?" section as the explanatory anchor.
 
 ## 2026-06-04 — Become a Curator (Grantless flow) [proposed story/epic — likely later]
+
 **Raw:** "What would we need if someone is interested in becoming a curator? Maybe instructions for
 what they should go do at tags.brainstorm.world… and maybe one day a UI/UX for that here."
 **Classified:** Feature — later than the arbiter flow. NOT yet a story; capturing intent.
@@ -256,6 +278,7 @@ this is a real lift (auth as the observer, list authoring, signing) and may belo
 not Grantless. Flag for a roundtable before committing.
 
 ## 2026-06-04 — "My funding activity" page (Funder profile) [future epic]
+
 **Raw:** "How would we go about adding a 'my funding activity' page where a Funder user can show off
 all the times they've contributed to crowdfunds — which ones succeeded, which were refunded, etc."
 **Classified:** Feature / future epic. NOT yet a story; capturing intent + the protocol angle.
@@ -263,16 +286,16 @@ all the times they've contributed to crowdfunds — which ones succeeded, which 
 record of "I backed these projects," which is itself WoT signal and a flex. Could be the Funder
 analogue of the applicant `/p/:npub` page and the arbiter's track record.
 **Protocol shape (to verify before planning):**
-- A contribution = a **kind 9735** zap receipt the funder caused, pointing at a project's **9041**
++ A contribution = a **kind 9735** zap receipt the funder caused, pointing at a project's **9041**
   goal (custodied by the arbiter). To list "my contributions" we need receipts attributable to the
   funder. NOTE the known wrinkle: a real 9735 is signed by the LNURL server, not the funder; the
   funder identity lives in the embedded `description` (the zap request, kind 9734) / `P` upper-tag.
   Our mock seed signs receipts as the funder — real data won't. **Resolver must key off the zap
   request's sender, not the receipt's pubkey.** Verify against NIP-57 during architecture.
-- **Outcome per contribution** (succeeded / refunded / still-open) comes from the task's latest
++ **Outcome per contribution** (succeeded / refunded / still-open) comes from the task's latest
   **33401** status + the **3402** conclusion (resolution successful → paid worker; failed/cancelled
   → refund). Reuse the latest-wins task dedupe + `calculateGoalProgress` + conclusion parsing.
-- Querying receipts by an arbitrary funder is the hard part — relays index `#e`/`#p`, not the
++ Querying receipts by an arbitrary funder is the hard part — relays index `#e`/`#p`, not the
   embedded zap-request sender. Likely need to fetch a project's receipts (we already do, via
   `useGoalsProgress`) and attribute, OR query the funder's own 9734 zap requests if they publish
   them. **Open question for architecture: can we cheaply find "all goals this pubkey funded"?**
@@ -282,6 +305,7 @@ mock vs real-zap behavior (payments are still mocked — this page will look dif
 LNURL receipts). Flag for a roundtable; depends on settling the real-9735 attribution path.
 
 ## 2026-06-05 — Zap-receipt reliability hardening [future story]
+
 **Raw:** During Story 13 (real Lightning contributions) the user asked: "is it a problem that an
 arbiter may receive zaps that never move the bar? How do other Nostr crowdfund apps deal with this?"
 **Classified:** Hardening follow-on. NOT yet a story; capturing intent + the analysis.
@@ -305,6 +329,7 @@ tighten `waitForReceipt` to match the specific zapRequestId/bolt11 rather than a
 the goal (the Story-13 review's non-blocking note). Not now — money-safety already holds.
 
 ## 2026-06-05 — Fix: detail-page crowdfunding empty (useZapGoal read the goal's embedded relays)
+
 **Raw:** Index cards showed "backers", but the task detail page's crowdfund section was empty —
 surfaced in a remote-relay/laptop-browser (tailscale) dev setup.
 **Classified:** Bug (obvious) — Implementer (gates) + intake note; no Architecture.
@@ -321,6 +346,7 @@ source. Gates: tsc + eslint + vitest + build clean. (Also relevant in prod if a 
 relays ever go stale/unreachable.)
 
 ## 2026-06-05 — Perf: crowdfund total loads slowly on prod (useZapGoal query shape) [future]
+
 **Raw:** On prod the task detail page's crowdfunding total takes a long time to load (and used to
 show 0 with no indicator — the honest loading state was fixed in 00b59ce; this note is the remaining
 *speed* follow-up).
@@ -339,6 +365,7 @@ honest loading indicator (00b59ce) covers the UX; remaining work is purely wall-
 zap-receipt-reliability hardening note (2026-06-05) touches the same read path — do them together.
 
 ## 2026-06-05 — UX fixes batch: payout note + profile relays + npub fallback
+
 **Raw:** (a) payout/refund should stay manual for now — add a message that the Catallax reference
 client (catallax-reference-client.netlify.app) supports automated Lightning payout/refund but
 Grantless doesn't yet; (b) "Wise Owl" placeholder name persists in the applicants list; (c) the
@@ -347,15 +374,15 @@ loading.
 **Classified:** Three Implementer-level fixes (small-UI precedent — no full phase path). Commits
 a4a8630, 2ba7630, eb214da.
 **Fixes:**
-- **Payout note** (a4a8630): muted note under the arbiter Conclude action — concluding records the
++ **Payout note** (a4a8630): muted note under the arbiter Conclude action — concluding records the
   outcome on Nostr but doesn't move sats; settle manually over Lightning; links the reference client.
-- **Profile relays** (2ba7630): `CuratorBrowser` queried curator/applicant kind-0 only from the
++ **Profile relays** (2ba7630): `CuratorBrowser` queried curator/applicant kind-0 only from the
   curation-list relays (Brainstorm / relay.grantless.org); a person's profile usually lives on their
   own relays, so on prod names never resolved → the placeholder stuck permanently. Now queries
   `union(getActiveRelays(config, presetRelays), listRelays)` (same blessed pattern as `useZapGoal`);
   no hardcoded relay fallback. Can't reproduce on the single-relay local seed (seed publishes every
   profile to the one relay) — **verify on prod**.
-- **npub fallback** (eb214da): new shared `src/lib/shortNpub.ts`; replaced every `genUserName`
++ **npub fallback** (eb214da): new shared `src/lib/shortNpub.ts`; replaced every `genUserName`
   placeholder on the Grantless surfaces (NomineeCard, ApplicantProjects, NomineeProjectItem,
   AssignArbiterControl, TaskDetail, CuratorBrowser) with a truncated npub. `genUserName` kept for the
   non-Grantless components (AuthorName/AuthorAvatar/NoteContent/AccountSwitcher) — open question
@@ -364,6 +391,7 @@ a4a8630, 2ba7630, eb214da.
 prime directive via broader user-overridable relay reads). Non-blocking notes only.
 
 ## 2026-06-06 — Diagnosis (no fix): Firefox "No curators found" was a wedged WS session
+
 **Raw:** On one Firefox window, "No curators found on this relay" with default relays selected;
 worked on all Chromium browsers (Brave/Chrome/Vanadium) on the same site + network.
 **Diagnosed (NOT a Grantless bug):** Firefox console showed "can't establish a connection" to **all
@@ -382,32 +410,33 @@ empty" and show an accurate message (extensions/AV/sleep-wake/WebSocket-blocked)
 status) to tell them apart. Parked.
 
 ## 2026-06-06 — Relay ops: negentropy-mirror curation lists Brainstorm → relay.grantless.org [PARKED — write-up]
+
 **Raw:** "What do we have to do to turn on negentropy syncing from wss://tags.brainstorm.world/relay
-to wss://relay.grantless.org? I want to constantly pull down _relevant_ tagging events." → User: put
+to wss://relay.grantless.org? I want to constantly pull down *relevant* tagging events." → User: put
 on hold, write it up; other fixes first.
 **Classified:** Relay-ops chore (strfry on the prod box), NOT app code. Fixes the genuine SPOF: curator
 discovery dies if Brainstorm is truly down (lists live ONLY on Brainstorm — 23×kind-30392;
 relay.grantless.org + Primal have 0). The README already earmarked this ("Later: mirror real curation
 data (negentropy)"); negentropy IS enabled in `strfry.prod.conf` (`negentropy = 2`).
 **Plan (ready to execute):**
-- **Filter = `{"kinds":[30392]}`** — can't go narrower: Grantless keys on `observer` / `source-tag`,
++ **Filter = `{"kinds":[30392]}`** — can't go narrower: Grantless keys on `observer` / `source-tag`,
   which are MULTI-letter tags → unfilterable in a Nostr filter (only single-letter tags are indexed).
   Volume is tiny so kind-only is fine + future-proof. (Narrowing to the grantless slugs would need a
   strfry `writePolicy` plugin inspecting `source-tag[3]` — not worth it at this volume.)
-- **One-shot negentropy pull (download-only):**
++ **One-shot negentropy pull (download-only):**
   `docker exec grantless-strfry-prod strfry sync wss://tags.brainstorm.world/relay --filter '{"kinds":[30392]}' --dir down`
-- **⚠️ Caveat:** Brainstorm is `strfry+nip50-proxy` (NIP-11 advertises only NIP-50) reached at `/relay`;
++ **⚠️ Caveat:** Brainstorm is `strfry+nip50-proxy` (NIP-11 advertises only NIP-50) reached at `/relay`;
   the search proxy may NOT pass NIP-77 (`NEG-OPEN`) through. Test the sync; if it errors/hangs, use the
   **proxy-safe fallback (no negentropy):**
   `nak req -k 30392 wss://tags.brainstorm.world/relay > /tmp/lists.jsonl` then
   `docker exec -i grantless-strfry-prod strfry import < /tmp/lists.jsonl`.
-- **Constant:** (A, recommended) cron every ~5 min running the sync OR the nak|import form — both cheap
++ **Constant:** (A, recommended) cron every ~5 min running the sync OR the nak|import form — both cheap
   at this volume, proxy-safe. (B) `strfry router` config (`dir="down"`, `urls=[brainstorm]`,
   `filter={kinds:[30392]}`) as a 2nd compose service for real-time streaming — needs the one-shot
   backfill first + a low-freq cron to cover reconnect gaps.
-- **No app change needed:** relay.grantless.org is already preset #1 in the default read set, so once
++ **No app change needed:** relay.grantless.org is already preset #1 in the default read set, so once
   mirrored the app resolves curators during a Brainstorm outage.
-- **Prime-directive OK:** `--dir down` only (never write to Brainstorm); mirroring public events grants
++ **Prime-directive OK:** `--dir down` only (never write to Brainstorm); mirroring public events grants
   no privilege, stays forkable. NOTE this refines the earlier "list events don't go on grantless.org"
   stance — that was the APP's write/broadcast policy; this is a relay-side READ mirror for resilience.
 **When executed, land in repo:** rewrite the README "Later" stub with the real procedure + proxy
@@ -415,6 +444,7 @@ caveat; add `relay/router.conf` (+ optional compose service) and a `relay/sync-c
 then `/review-changes`.
 
 ## 2026-06-07 — Story 16 done: operator helper panel (admin) shipped + verified on prod
+
 **Raw:** Operator-only `/admin` panel surfacing stuck projects (unvouched by any curator; no arbiter).
 **Status:** DONE — story 16 / ADR 0015 / review 16 (PASS). Verified working on prod by the user
 (operator npub set in Vercel via `VITE_GRANTLESS_OPERATOR`). Local test: set that env to a seed npub
@@ -424,6 +454,7 @@ then `/review-changes`.
 in-env (NixOS/no chromium) — owe a real `npm run test:browser`.
 
 ## 2026-06-07 — Project-link social-share previews [PARKED — decided NOT to build now]
+
 **Raw:** "Sharing a project link shows the generic landing-page preview — a bummer. Feasible to add
 per-project OG tags? If complicated, skip; document the options." → User: don't build now, document it.
 **Classified:** Enhancement, parked. NOT a story.
@@ -433,21 +464,22 @@ generic Grantless OG tags added in 1a3e1f8). So per-project previews need SERVER
 tags. Today the deploy is a pure static SPA on Vercel (`vercel.json` rewrites all → index.html; no
 serverless functions).
 **Options (from the analysis):**
-- **A (recommended if/when we do it):** a Vercel Node serverless function for `/task/*` that fetches the
++ **A (recommended if/when we do it):** a Vercel Node serverless function for `/task/*` that fetches the
   33401 from the default relay set server-side, clones index.html, swaps the OG/Twitter block with the
   project's title/amount/description, returns it (SPA still boots for humans). Extract the existing
   `generateMetaDescription` logic into `lib/` so client Helmet + server share one source of truth.
   Must use a short timeout + FALL BACK to generic tags on miss/slow relay; cache via `s-maxage`.
-- **B:** A + dynamic OG image via `@vercel/og` (branded card: title/sats/status). Defer.
-- **C:** Prerender service (UA-sniff bots → headless snapshot). Rejected — external dep, cost, against
++ **B:** A + dynamic OG image via `@vercel/og` (branded card: title/sats/status). Defer.
++ **C:** Prerender service (UA-sniff bots → headless snapshot). Rejected — external dep, cost, against
   the forkable/self-host ethos.
-- **D:** Do nothing (current). "Copy link" works; previews stay generic.
++ **D:** Do nothing (current). "Copy link" works; previews stay generic.
 **Tradeoff that made us hold:** Option A introduces the FIRST server component (no longer pure static)
 and makes rich previews Vercel-specific (forkers on plain static hosting degrade gracefully to generic
 previews — document as a progressive enhancement; prime-directive-fine: reads public events from the
 overridable relay set, no privilege). `/plan-feature` candidate when revisited.
 
 ## 2026-06-07 — Negentropy mirror: repo artifacts landed (execution pending on prod box)
+
 **Status:** Repo side DONE — added `relay/sync-curation.sh` (tries negentropy `strfry sync --dir down`,
 falls back to proxy-safe `nak req | strfry import`; all-env-overridable), `relay/router.conf` (advanced
 continuous-streaming example, verify-for-version), and rewrote the relay README "Later" stub into the
@@ -458,6 +490,7 @@ passes NIP-77; pin `MODE=negentropy` or `MODE=fetch` accordingly; install the cr
 serves the 30392s and curator discovery survives a Brainstorm outage (no app change — it's preset #1).
 
 ## 2026-06-08 — Negentropy mirror: WORKS (open question resolved)
+
 **Result:** `docker exec -w /app grantless-strfry-prod /app/strfry sync wss://tags.brainstorm.world/relay
 --filter '{"kinds":[30392]}' --dir down` succeeded on the prod box → **Brainstorm's nip50-proxy DOES pass
 NIP-77**. Pin `MODE=negentropy` (efficient diff); the nak|import fallback is unneeded. Image quirks
@@ -467,11 +500,13 @@ built-in router (`ROUTER=1` + mount router.conf → /etc/strfry-router.conf) for
 curator discovery survives a Brainstorm outage with no app change.
 
 ## 2026-06-08 — Story 17 done: faster loads (caching + code-splitting) — shipped to master
+
 **Status:** DONE — story 17 / ADR 0016 / review 17 (PASS). Test Design skipped by decision; verified on
 Vercel staging, merged to master. Persist react-query cache to localStorage (superjson — Map-safe),
 stale-while-revalidate (dropped catallax staleTime:0/focus overrides; own-actions stay fresh via the
 existing useNostrPublish ['catallax'] invalidation), relay set added to all catallax query keys
 (cross-context cache correctness), hot browse timeout 10s→5s, React.lazy routes (bundle 775KB→~518KB core
+
 + per-page chunks), ErrorBoundary safety net.
 **Regression caught + fixed on staging (b68e525):** plain-JSON persistence corrupted Map query data
 (useGoalsProgress/useNomineeProfiles) → "S.get is not a function" white screen on REFRESH only. Fix:
@@ -479,4 +514,20 @@ superjson serializer + buster v1→v2 (discards old broken caches) + ErrorBounda
 & manifest 401 on the branch deploy were Vercel preview-env noise, NOT the crash.
 **Non-blocking follow-ups (from review):** (a) add a persistence round-trip unit test (Map survives
 persist→restore) — the serializer is now load-bearing; (b) optional manualChunks vendor split (core still
+
 >500KB); (c) the parked 2026-06-05 funding-load progressive-render note remains a deeper follow-on.
+
+## 2026-06-08 — Story 18 done: patron edits a proposed task's fields (+ author guidance callouts)
+
+**Status:** DONE — story 18 / ADR 0017 / review 18 (PASS). Patron-only edit of a `proposed` task via
+re-publish (shared ProjectForm + EditProjectDialog); amount locked once a goal exists (9041 isn't
+replaceable); "Open for funding" now confirms the amount-lock; optional deadline added (empty → omitted,
+never defaulted) to both create + edit. Pure helpers canEditTask/canEditTaskAmount/parseDeadlineInput
+(unit-tested). NOT yet pushed to master (on local master after merge of 17).
+**Same-session add (commit 46e0073):** PatronGuidance callouts on the task detail page mirror the Admin
+panel's stuck conditions first-person ("assign an arbiter to unlock funding"; "not visible until a curator
+lists you — self-curate"); best-effort (only flags invisibility once curation settled).
+**Non-blocking follow-ups (from review):** (a) add an e2e that edits+SAVES a descriptive field on a
+funding-open task (seed-seeking-alice) to prove the disabled-amount value survives RHF; (b) run the
+Playwright edit-task spec in a real browser env; (c) PatronGuidance + CrowdfundSection both say "assign an
+arbiter" — consider deduping.
