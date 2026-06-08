@@ -57,10 +57,14 @@ relay and it works identically (Grantless prime directive). `negentropy` is enab
 
 Run from the host where the strfry container runs:
 
+The `dockurr/strfry` image doesn't put `strfry` on `$PATH`, so call it by absolute path
+(`/app/strfry`). Confirm yours with
+`docker exec grantless-strfry-prod sh -c 'tr "\0" " " < /proc/1/cmdline; echo'`.
+
 ```sh
 # Negentropy (NIP-77) — efficient diff. Try this first:
 docker exec grantless-strfry-prod \
-  strfry sync wss://tags.brainstorm.world/relay --filter '{"kinds":[30392]}' --dir down
+  /app/strfry sync wss://tags.brainstorm.world/relay --filter '{"kinds":[30392]}' --dir down
 ```
 
 ⚠️ `tags.brainstorm.world` is a `strfry+nip50-proxy` reached at `/relay`; the search proxy
@@ -69,7 +73,7 @@ docker exec grantless-strfry-prod \
 
 ```sh
 nak req -k 30392 wss://tags.brainstorm.world/relay \
-  | docker exec -i grantless-strfry-prod strfry import
+  | docker exec -i grantless-strfry-prod /app/strfry import
 ```
 
 `relay/sync-curation.sh` wraps both: it tries negentropy and falls back to `nak|import`

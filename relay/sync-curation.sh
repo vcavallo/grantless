@@ -21,6 +21,10 @@ set -euo pipefail
 
 SOURCE_RELAY="${SOURCE_RELAY:-wss://tags.brainstorm.world/relay}"
 STRFRY_CONTAINER="${STRFRY_CONTAINER:-grantless-strfry-prod}"
+# The strfry binary path INSIDE the container. The dockurr/strfry image doesn't put
+# it on $PATH, so use the absolute path. Confirm yours with:
+#   docker exec <container> sh -c 'tr "\0" " " < /proc/1/cmdline; echo'
+STRFRY_BIN="${STRFRY_BIN:-/app/strfry}"
 KIND="${KIND:-30392}"
 # auto = try negentropy, fall back to fetch | negentropy = NIP-77 only | fetch = nak|import only
 MODE="${MODE:-auto}"
@@ -33,14 +37,14 @@ sync_negentropy() {
   # NIP-77 set reconciliation — efficient diff. Needs the source to support it;
   # tags.brainstorm.world is a strfry+nip50-proxy and may NOT pass NEG-OPEN through.
   timeout "${SYNC_TIMEOUT}" docker exec "${STRFRY_CONTAINER}" \
-    strfry sync "${SOURCE_RELAY}" --filter "${filter}" --dir down
+    "${STRFRY_BIN}" sync "${SOURCE_RELAY}" --filter "${filter}" --dir down
 }
 
 fetch_import() {
   # Proxy-safe fallback: a plain REQ via nak, piped into strfry import. Always
   # works (no NIP-77 needed). Requires `nak` on the host.
   nak req -k "${KIND}" "${SOURCE_RELAY}" \
-    | timeout "${SYNC_TIMEOUT}" docker exec -i "${STRFRY_CONTAINER}" strfry import
+    | timeout "${SYNC_TIMEOUT}" docker exec -i "${STRFRY_CONTAINER}" "${STRFRY_BIN}" import
 }
 
 case "${MODE}" in
