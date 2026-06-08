@@ -67,6 +67,22 @@ test.describe('editing fields', () => {
     await expect(page.getByText(/can'?t be changed|locked|funding (is )?open/i)).toBeVisible();
   });
 
+  test('a descriptive edit still saves on a funding-open task (disabled amount preserved)', async ({ page }) => {
+    // Guards the one path where a disabled amount field could break Save: editing a
+    // task that already has a goal. The amount stays locked but the save must succeed
+    // (the current amount is preserved) and the new description must take.
+    await loginAs(page, ALICE);
+    await rememberCurator(page);
+    await page.goto(`/task/${naddr(ALICE.pub, 'seed-seeking-alice')}`);
+    await editButton(page).click();
+    await expect(page.getByLabel(/amount|funding target/i)).toBeDisabled();
+    await page.getByLabel(/description/i).fill('Edited while funding is open');
+    await page.getByRole('button', { name: /save/i }).click();
+    await expect(page.getByText('Edited while funding is open')).toBeVisible({ timeout: 15_000 });
+    // The funding section is still present (the goal/amount were untouched).
+    await expect(page.getByText(/raised of/i)).toBeVisible();
+  });
+
   test('clearing the title blocks save with an error', async ({ page }) => {
     await loginAs(page, ALICE);
     await page.goto(`/task/${naddr(ALICE.pub, 'seed-proposed-alice')}`);
