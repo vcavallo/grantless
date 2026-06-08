@@ -465,3 +465,17 @@ learned: binary at `/app/strfry` (not on $PATH), must run with `-w /app`; the do
 built-in router (`ROUTER=1` + mount router.conf → /etc/strfry-router.conf) for real-time mirroring.
 **Left:** install the cron (or flip ROUTER=1) on the box; then relay.grantless.org serves the 30392s and
 curator discovery survives a Brainstorm outage with no app change.
+
+## 2026-06-08 — Story 18 done: patron edits a proposed task's fields (+ author guidance callouts)
+**Status:** DONE — story 18 / ADR 0017 / review 18 (PASS). Patron-only edit of a `proposed` task via
+re-publish (shared ProjectForm + EditProjectDialog); amount locked once a goal exists (9041 isn't
+replaceable); "Open for funding" now confirms the amount-lock; optional deadline added (empty → omitted,
+never defaulted) to both create + edit. Pure helpers canEditTask/canEditTaskAmount/parseDeadlineInput
+(unit-tested). NOT yet pushed to master (on local master after merge of 17).
+**Same-session add (commit 46e0073):** PatronGuidance callouts on the task detail page mirror the Admin
+panel's stuck conditions first-person ("assign an arbiter to unlock funding"; "not visible until a curator
+lists you — self-curate"); best-effort (only flags invisibility once curation settled).
+**Non-blocking follow-ups (from review):** (a) add an e2e that edits+SAVES a descriptive field on a
+funding-open task (seed-seeking-alice) to prove the disabled-amount value survives RHF; (b) run the
+Playwright edit-task spec in a real browser env; (c) PatronGuidance + CrowdfundSection both say "assign an
+arbiter" — consider deduping.

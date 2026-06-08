@@ -1,6 +1,6 @@
 # Story 18: Patron can edit a proposed task's fields
 
-**Status:** Approved
+**Status:** Done
 **Created:** 2026-06-08
 **Type:** Feature
 
@@ -98,4 +98,4 @@ Catallax is open, permissionless, WoT-based — this story respects that:
 ## Linked artifacts
 - ADR: `.pi/engineering-team/decisions/0017-edit-task-fields.md`
 - Test plan: `.pi/engineering-team/stories/18-edit-task-fields.test-plan.md`
-- Review: (filled in after Review phase)
+- Review: `.pi/engineering-team/reviews/18-edit-task-fields.md` — **PASS**
